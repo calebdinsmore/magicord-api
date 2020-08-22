@@ -514,6 +514,17 @@ namespace Magicord.Models
                   .HasConstraintName("tokens_ibfk_1");
       });
 
+      modelBuilder.Entity<UserCard>()
+        .HasKey(uc => new { uc.CardId, uc.UserId });
+      modelBuilder.Entity<UserCard>()
+          .HasOne(uc => uc.Card)
+          .WithMany(c => c.UserCards)
+          .HasForeignKey(uc => uc.CardId);
+      modelBuilder.Entity<UserCard>()
+          .HasOne(uc => uc.User)
+          .WithMany(u => u.UserCards)
+          .HasForeignKey(uc => uc.UserId);
+
       OnModelCreatingPartial(modelBuilder);
     }
 

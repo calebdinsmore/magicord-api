@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Magicord.Modules.Users.Dto;
 using Magicord.Modules.Users;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Magicord.Core.Security;
 
 namespace Magicord.Controllers
 {
@@ -20,6 +22,7 @@ namespace Magicord.Controllers
 
     // GET api/users
     [HttpGet("")]
+    [DiscordOnly]
     public IEnumerable<UserDto> GetUsers()
     {
       return _userManager.GetAll();

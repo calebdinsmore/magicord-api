@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Magicord.Core.Configuration;
 using Magicord.Core.Middleware;
+using Magicord.Core.Security;
 using Magicord.Models;
 using Magicord.Modules.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -31,10 +34,15 @@ namespace Magicord
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddAutoMapper(typeof(Startup));
+      services.AddControllers().AddNewtonsoftJson();
+      services.AddHttpContextAccessor();
+
+      // Configure settins and DbContext
+      IConfigurationSection configurationSection = Configuration.GetSection("ConfigSettings");
+      services.Configure<ConfigSettings>(configurationSection);
       services.AddDbContext<MagicordContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")).UseSnakeCaseNamingConvention());
 
       services.AddScoped<IUserManager, UserManager>();
-      services.AddControllers().AddNewtonsoftJson();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
