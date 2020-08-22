@@ -32,8 +32,6 @@ namespace Magicord.Core.Security
 
       filterContext.HttpContext.Request.Headers.TryGetValue("DiscordAccessKey", out var accessKey);
 
-      Console.WriteLine(_discordAccessKey);
-
       if (accessKey != _discordAccessKey)
       {
         filterContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
