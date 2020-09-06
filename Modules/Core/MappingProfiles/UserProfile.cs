@@ -8,7 +8,7 @@ namespace Magicord.Modules.Core.MappingProfiles
   {
     public UserProfile()
     {
-      CreateMap<User, UserDto>();
+      CreateMap<User, UserDto>().ReverseMap();
     }
   }
 }

@@ -34,6 +34,7 @@ namespace Magicord.Core.Middleware
 
       // Specify different custom exceptions here
       if (ex is ValidationFailureException) code = HttpStatusCode.BadRequest;
+      if (ex is InvalidMagicordOperationException) code = HttpStatusCode.BadRequest;
 
       string result = JsonConvert.SerializeObject(new { error = ex.Message });
 

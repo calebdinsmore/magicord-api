@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using Magicord.Core.Exceptions;
 using Magicord.Models;
 using Magicord.Modules.Users.Dto;
 
@@ -20,6 +21,20 @@ namespace Magicord.Modules.Users
     {
       var result = _mapper.Map<IEnumerable<UserDto>>(_dataContext.Users.AsEnumerable());
       return result;
+    }
+
+    public UserDto Create(UserDto dto)
+    {
+      var entity = _mapper.Map<User>(dto);
+      entity.Balance = 50;
+      if (_dataContext.Users.Any(x => x.Id == dto.Id))
+      {
+        throw new InvalidMagicordOperationException("A user with this Discord ID already exists.");
+      }
+      _dataContext.Users.Add(entity);
+      _dataContext.SaveChanges();
+
+      return _mapper.Map<UserDto>(entity);
     }
 
     public long Upsert(UserDto dto)

@@ -37,9 +37,9 @@ namespace Magicord.Controllers
 
     // POST api/users
     [HttpPost("")]
-    public long Upsert(UserDto value)
+    public UserDto CreateUser(UserDto value)
     {
-      return _userManager.Upsert(value);
+      return _userManager.Create(value);
     }
 
     // DELETE api/users/5
