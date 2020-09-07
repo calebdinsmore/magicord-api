@@ -35,8 +35,8 @@ namespace Magicord.Models
     public virtual DbSet<Set> Sets { get; set; }
     public virtual DbSet<SetTranslation> SetTranslations { get; set; }
     public virtual DbSet<Token> Tokens { get; set; }
-
     public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<CardPrice> CardPrices { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -227,7 +227,17 @@ namespace Magicord.Models
                   .HasPrincipalKey(p => p.Code)
                   .HasForeignKey(d => d.SetCode)
                   .HasConstraintName("cards_ibfk_1");
+
+        entity.HasOne(c => c.CardPrice)
+              .WithOne(cp => cp.Card)
+              .HasPrincipalKey<Card>(c => c.Uuid)
+              .HasForeignKey<CardPrice>(cp => cp.CardUuid)
+              .IsRequired();
       });
+
+      modelBuilder.Entity<CardPrice>()
+        .HasIndex(cp => cp.CardUuid)
+        .IsUnique();
 
       modelBuilder.Entity<ForeignData>(entity =>
       {
