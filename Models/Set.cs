@@ -37,5 +37,6 @@ namespace Magicord.Models
     public virtual ICollection<Card> Cards { get; set; }
     public virtual ICollection<SetTranslation> SetTranslations { get; set; }
     public virtual ICollection<Token> Tokens { get; set; }
+    public virtual ICollection<Booster> Boosters { get; set; }
   }
 }

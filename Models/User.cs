@@ -8,5 +8,6 @@ namespace Magicord.Models
     public decimal Balance { get; set; }
 
     public virtual ICollection<UserCard> UserCards { get; set; }
+    public virtual ICollection<UserBooster> UserBoosters { get; set; }
   }
 }
