@@ -525,11 +525,12 @@ namespace Magicord.Models
       });
 
       modelBuilder.Entity<UserCard>()
-        .HasKey(uc => new { uc.CardId, uc.UserId });
+        .HasKey(uc => new { uc.CardUuid, uc.UserId });
       modelBuilder.Entity<UserCard>()
           .HasOne(uc => uc.Card)
           .WithMany(c => c.UserCards)
-          .HasForeignKey(uc => uc.CardId);
+          .HasPrincipalKey(c => c.Uuid)
+          .HasForeignKey(uc => uc.CardUuid);
       modelBuilder.Entity<UserCard>()
           .HasOne(uc => uc.User)
           .WithMany(u => u.UserCards)
