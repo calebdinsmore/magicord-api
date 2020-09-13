@@ -89,7 +89,7 @@ namespace Magicord.Models
     public virtual ICollection<Legality> Legalities { get; set; }
     public virtual ICollection<Ruling> Rulings { get; set; }
     public virtual ICollection<UserCard> UserCards { get; set; }
-    public virtual ICollection<BoosterCard> BoosterCards { get; set; }
+    public virtual ICollection<UserBoosterCard> UserBoosterCards { get; set; }
     public virtual CardPrice CardPrice { get; set; }
   }
 }

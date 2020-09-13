@@ -37,7 +37,8 @@ namespace Magicord.Models
     public virtual DbSet<Token> Tokens { get; set; }
     public virtual DbSet<User> Users { get; set; }
     public virtual DbSet<CardPrice> CardPrices { get; set; }
-    public virtual DbSet<Booster> Boosters { get; set; }
+    public virtual DbSet<UserBooster> UserBoosters { get; set; }
+    public virtual DbSet<StoreBoosterListing> StoreBoosterListings { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -538,36 +539,36 @@ namespace Magicord.Models
           .HasForeignKey(uc => uc.UserId);
 
       modelBuilder.Entity<UserBooster>()
-        .HasKey(ub => new { ub.UserId, ub.BoosterId });
-      modelBuilder.Entity<UserBooster>()
         .HasOne(ub => ub.User)
         .WithMany(u => u.UserBoosters)
         .HasForeignKey(ub => ub.UserId);
       modelBuilder.Entity<UserBooster>()
-        .HasOne(ub => ub.Booster)
+        .HasOne(ub => ub.Set)
         .WithMany(b => b.UserBoosters)
-        .HasForeignKey(ub => ub.BoosterId);
+        .HasPrincipalKey(s => s.Code)
+        .HasForeignKey(ub => ub.SetCode);
 
-      modelBuilder.Entity<BoosterCard>(entity =>
+      modelBuilder.Entity<UserBoosterCard>(entity =>
       {
-        entity.HasKey(bc => new { bc.BoosterId, bc.CardUuid });
-
         entity.HasOne(bc => bc.Card)
-              .WithMany(c => c.BoosterCards)
+              .WithMany(c => c.UserBoosterCards)
               .HasPrincipalKey(c => c.Uuid)
               .HasForeignKey(bc => bc.CardUuid);
 
-        entity.HasOne(bc => bc.Booster)
-              .WithMany(b => b.BoosterCards)
-              .HasForeignKey(bc => bc.BoosterId);
+        entity.HasOne(bc => bc.UserBooster)
+              .WithMany(b => b.UserBoosterCards)
+              .HasForeignKey(bc => bc.UserBoosterId);
       });
 
-      modelBuilder.Entity<Booster>()
-        .HasOne(b => b.Set)
-        .WithMany(s => s.Boosters)
-        .HasPrincipalKey(s => s.Code)
-        .HasForeignKey(b => b.SetCode);
+      modelBuilder.Entity<StoreBoosterListing>(entity =>
+      {
+        entity.HasOne(sbl => sbl.Set)
+          .WithMany(s => s.StoreBoosterListings)
+          .HasPrincipalKey(s => s.Code)
+          .HasForeignKey(sbl => sbl.SetCode);
 
+        entity.Property(sbl => sbl.BoosterType).HasDefaultValue("default");
+      });
 
       OnModelCreatingPartial(modelBuilder);
     }

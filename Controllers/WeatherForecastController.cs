@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Magicord.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Magicord.Controllers
 {
@@ -27,9 +29,10 @@ namespace Magicord.Controllers
     }
 
     [HttpGet]
-    public IEnumerable<Set> Get()
+    public Set Get()
     {
-      return _magicordContext.Sets.ToArray().Take(5);
+      var set = _magicordContext.Sets.First(x => x.Booster != null);
+      return set;
     }
   }
 }

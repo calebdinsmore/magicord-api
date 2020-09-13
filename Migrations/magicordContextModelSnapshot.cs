@@ -33,58 +33,6 @@ namespace Magicord.Migrations
                 .HasAnnotation("ProductVersion", "3.1.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            modelBuilder.Entity("Magicord.Models.Booster", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id")
-                        .HasColumnType("bigint")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<decimal>("BuyPrice")
-                        .HasColumnName("buy_price")
-                        .HasColumnType("numeric");
-
-                    b.Property<bool>("IsOpened")
-                        .HasColumnName("is_opened")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("SetCode")
-                        .HasColumnName("set_code")
-                        .HasColumnType("character varying(8)");
-
-                    b.HasKey("Id")
-                        .HasName("pk_boosters");
-
-                    b.HasIndex("SetCode")
-                        .HasName("ix_booster_set_code");
-
-                    b.ToTable("booster");
-                });
-
-            modelBuilder.Entity("Magicord.Models.BoosterCard", b =>
-                {
-                    b.Property<long>("BoosterId")
-                        .HasColumnName("booster_id")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("CardUuid")
-                        .HasColumnName("card_uuid")
-                        .HasColumnType("character varying(36)");
-
-                    b.Property<long>("Id")
-                        .HasColumnName("id")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("BoosterId", "CardUuid")
-                        .HasName("pk_booster_card");
-
-                    b.HasIndex("CardUuid")
-                        .HasName("ix_booster_card_card_uuid");
-
-                    b.ToTable("booster_card");
-                });
-
             modelBuilder.Entity("Magicord.Models.Card", b =>
                 {
                     b.Property<long>("Id")
@@ -687,6 +635,42 @@ namespace Magicord.Migrations
                     b.ToTable("set_translation","dbo");
                 });
 
+            modelBuilder.Entity("Magicord.Models.StoreBoosterListing", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id")
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("BoosterType")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("booster_type")
+                        .HasColumnType("text")
+                        .HasDefaultValue("default");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnName("is_active")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("RetailPrice")
+                        .HasColumnName("retail_price")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("SetCode")
+                        .IsRequired()
+                        .HasColumnName("set_code")
+                        .HasColumnType("character varying(8)");
+
+                    b.HasKey("Id")
+                        .HasName("pk_store_booster_listings");
+
+                    b.HasIndex("SetCode")
+                        .HasName("ix_store_booster_listing_set_code");
+
+                    b.ToTable("store_booster_listing");
+                });
+
             modelBuilder.Entity("Magicord.Models.Token", b =>
                 {
                     b.Property<long>("Id")
@@ -889,25 +873,66 @@ namespace Magicord.Migrations
 
             modelBuilder.Entity("Magicord.Models.UserBooster", b =>
                 {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id")
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<decimal>("BuyPrice")
+                        .HasColumnName("buy_price")
+                        .HasColumnType("numeric");
+
+                    b.Property<bool>("IsOpened")
+                        .HasColumnName("is_opened")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SetCode")
+                        .HasColumnName("set_code")
+                        .HasColumnType("character varying(8)");
+
                     b.Property<long>("UserId")
                         .HasColumnName("user_id")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("BoosterId")
-                        .HasColumnName("booster_id")
-                        .HasColumnType("bigint");
+                    b.HasKey("Id")
+                        .HasName("pk_user_boosters");
 
-                    b.Property<long>("Id")
-                        .HasColumnName("id")
-                        .HasColumnType("bigint");
+                    b.HasIndex("SetCode")
+                        .HasName("ix_user_booster_set_code");
 
-                    b.HasKey("UserId", "BoosterId")
-                        .HasName("pk_user_booster");
-
-                    b.HasIndex("BoosterId")
-                        .HasName("ix_user_booster_booster_id");
+                    b.HasIndex("UserId")
+                        .HasName("ix_user_boosters_user_id");
 
                     b.ToTable("user_booster");
+                });
+
+            modelBuilder.Entity("Magicord.Models.UserBoosterCard", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id")
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("CardUuid")
+                        .HasColumnName("card_uuid")
+                        .HasColumnType("character varying(36)");
+
+                    b.Property<long>("UserBoosterId")
+                        .HasColumnName("user_booster_id")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id")
+                        .HasName("pk_user_booster_card");
+
+                    b.HasIndex("CardUuid")
+                        .HasName("ix_user_booster_card_card_uuid");
+
+                    b.HasIndex("UserBoosterId")
+                        .HasName("ix_user_booster_card_user_booster_id");
+
+                    b.ToTable("user_booster_card");
                 });
 
             modelBuilder.Entity("Magicord.Models.UserCard", b =>
@@ -927,33 +952,6 @@ namespace Magicord.Migrations
                         .HasName("ix_user_card_user_id");
 
                     b.ToTable("user_card");
-                });
-
-            modelBuilder.Entity("Magicord.Models.Booster", b =>
-                {
-                    b.HasOne("Magicord.Models.Set", "Set")
-                        .WithMany("Boosters")
-                        .HasForeignKey("SetCode")
-                        .HasConstraintName("fk_boosters_sets_set_id")
-                        .HasPrincipalKey("Code");
-                });
-
-            modelBuilder.Entity("Magicord.Models.BoosterCard", b =>
-                {
-                    b.HasOne("Magicord.Models.Booster", "Booster")
-                        .WithMany("BoosterCards")
-                        .HasForeignKey("BoosterId")
-                        .HasConstraintName("fk_booster_card_boosters_booster_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Magicord.Models.Card", "Card")
-                        .WithMany("BoosterCards")
-                        .HasForeignKey("CardUuid")
-                        .HasConstraintName("fk_booster_card_cards_card_id")
-                        .HasPrincipalKey("Uuid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Magicord.Models.Card", b =>
@@ -1022,6 +1020,17 @@ namespace Magicord.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Magicord.Models.StoreBoosterListing", b =>
+                {
+                    b.HasOne("Magicord.Models.Set", "Set")
+                        .WithMany("StoreBoosterListings")
+                        .HasForeignKey("SetCode")
+                        .HasConstraintName("fk_store_booster_listings_sets_set_id")
+                        .HasPrincipalKey("Code")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Magicord.Models.Token", b =>
                 {
                     b.HasOne("Magicord.Models.Set", "SetCodeNavigation")
@@ -1035,17 +1044,32 @@ namespace Magicord.Migrations
 
             modelBuilder.Entity("Magicord.Models.UserBooster", b =>
                 {
-                    b.HasOne("Magicord.Models.Booster", "Booster")
+                    b.HasOne("Magicord.Models.Set", "Set")
                         .WithMany("UserBoosters")
-                        .HasForeignKey("BoosterId")
-                        .HasConstraintName("fk_user_booster_boosters_booster_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SetCode")
+                        .HasConstraintName("fk_user_boosters_sets_set_id")
+                        .HasPrincipalKey("Code");
 
                     b.HasOne("Magicord.Models.User", "User")
                         .WithMany("UserBoosters")
                         .HasForeignKey("UserId")
-                        .HasConstraintName("fk_user_booster_users_user_id")
+                        .HasConstraintName("fk_user_boosters_users_user_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Magicord.Models.UserBoosterCard", b =>
+                {
+                    b.HasOne("Magicord.Models.Card", "Card")
+                        .WithMany("UserBoosterCards")
+                        .HasForeignKey("CardUuid")
+                        .HasConstraintName("fk_user_booster_card_cards_card_id")
+                        .HasPrincipalKey("Uuid");
+
+                    b.HasOne("Magicord.Models.UserBooster", "UserBooster")
+                        .WithMany("UserBoosterCards")
+                        .HasForeignKey("UserBoosterId")
+                        .HasConstraintName("fk_user_booster_card_user_boosters_user_booster_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

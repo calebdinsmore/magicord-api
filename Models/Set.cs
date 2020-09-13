@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
 using Magicord.Models.Enums;
 
 namespace Magicord.Models
@@ -37,6 +39,7 @@ namespace Magicord.Models
     public virtual ICollection<Card> Cards { get; set; }
     public virtual ICollection<SetTranslation> SetTranslations { get; set; }
     public virtual ICollection<Token> Tokens { get; set; }
-    public virtual ICollection<Booster> Boosters { get; set; }
+    public virtual ICollection<UserBooster> UserBoosters { get; set; }
+    public virtual ICollection<StoreBoosterListing> StoreBoosterListings { get; set; }
   }
 }
