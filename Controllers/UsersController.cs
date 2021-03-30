@@ -14,19 +14,19 @@ namespace Magicord.Controllers
   [ApiController]
   public class UsersController : ControllerBase
   {
-    private readonly IUserManager _userManager;
-    public UsersController(IUserManager userManager)
+    private readonly IUserService _userManager;
+    public UsersController(IUserService userManager)
     {
       _userManager = userManager;
     }
 
     // GET api/users
-    [HttpGet("")]
-    [DiscordOnly]
-    public IEnumerable<UserDto> GetUsers()
-    {
-      return _userManager.GetAll();
-    }
+    // [HttpGet("")]
+    // [DiscordOnly]
+    // public IEnumerable<UserDto> GetUsers()
+    // {
+    //   return _userManager.GetAll();
+    // }
 
     // GET api/users/5
     [HttpGet("{id}")]
@@ -36,11 +36,11 @@ namespace Magicord.Controllers
     }
 
     // POST api/users
-    [HttpPost("")]
-    public UserDto CreateUser(UserDto value)
-    {
-      return _userManager.Create(value);
-    }
+    // [HttpPost("")]
+    // public UserDto CreateUser(UserDto value)
+    // {
+    //   // return _userManager.Create(value);
+    // }
 
     // DELETE api/users/5
     [HttpDelete("{id}")]

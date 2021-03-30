@@ -6,6 +6,9 @@ using AutoMapper;
 using Magicord.Core.Configuration;
 using Magicord.Core.Middleware;
 using Magicord.Core.Security;
+using Magicord.GraphQL;
+using Magicord.GraphQL.MutationTypes;
+using Magicord.GraphQL.QueryTypes;
 using Magicord.Models;
 using Magicord.Modules.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -23,6 +26,8 @@ namespace Magicord
 {
   public class Startup
   {
+    readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
     public Startup(IConfiguration configuration)
     {
       Configuration = configuration;
@@ -33,16 +38,31 @@ namespace Magicord
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
+      services
+        .AddGraphQLServer()
+        .AddQueryType<UserQueryType>()
+        .AddMutationType<UserMutationType>()
+        .AddProjections();
+
+      services.AddCors(options =>
+      {
+        options.AddPolicy(name: MyAllowSpecificOrigins,
+                          builder =>
+                          {
+                            builder.WithOrigins("http://localhost");
+                          });
+      });
       services.AddAutoMapper(typeof(Startup));
       services.AddControllers().AddNewtonsoftJson();
       services.AddHttpContextAccessor();
 
-      // Configure settins and DbContext
+
+      // Configure settings and DbContext
       IConfigurationSection configurationSection = Configuration.GetSection("ConfigSettings");
       services.Configure<ConfigSettings>(configurationSection);
       services.AddDbContext<MagicordContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")).UseSnakeCaseNamingConvention());
 
-      services.AddScoped<IUserManager, UserManager>();
+      services.AddScoped<IUserService, UserService>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,16 +70,23 @@ namespace Magicord
     {
       app.UseMiddleware(typeof(HttpErrorHandlingMiddleware));
 
-      app.UseHttpsRedirection();
+      // app.UseHttpsRedirection();
 
-      app.UseRouting();
 
-      app.UseAuthorization();
+      app.UseCors(MyAllowSpecificOrigins);
 
-      app.UseEndpoints(endpoints =>
-      {
-        endpoints.MapControllers();
-      });
+      app
+        .UseRouting()
+        .UseEndpoints(endpoints =>
+        {
+          endpoints.MapGraphQL();
+        });
+      // app.UseAuthorization();
+
+      // app.UseEndpoints(endpoints =>
+      // {
+      //   endpoints.MapControllers();
+      // });
     }
   }
 }

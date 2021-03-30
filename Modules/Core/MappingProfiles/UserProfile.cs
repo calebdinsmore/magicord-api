@@ -1,6 +1,7 @@
 using AutoMapper;
 using Magicord.Modules.Users.Dto;
 using Magicord.Models;
+using Magicord.Modules.Users;
 
 namespace Magicord.Modules.Core.MappingProfiles
 {
@@ -9,6 +10,7 @@ namespace Magicord.Modules.Core.MappingProfiles
     public UserProfile()
     {
       CreateMap<User, UserDto>().ReverseMap();
+      CreateMap<User, CreateUserInputDto>().ReverseMap();
     }
   }
 }
