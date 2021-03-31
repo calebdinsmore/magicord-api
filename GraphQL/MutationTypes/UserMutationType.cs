@@ -5,7 +5,7 @@ using Magicord.Modules.Users;
 
 namespace Magicord.GraphQL.MutationTypes
 {
-  public class UserMutationType
+  public partial class Mutation
   {
     public User CreateUser([Service] IUserService userService, CreateUserInputDto input)
     {

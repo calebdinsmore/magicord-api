@@ -10,6 +10,7 @@ using Magicord.GraphQL;
 using Magicord.GraphQL.MutationTypes;
 using Magicord.GraphQL.QueryTypes;
 using Magicord.Models;
+using Magicord.Modules.Booster;
 using Magicord.Modules.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -40,8 +41,8 @@ namespace Magicord
     {
       services
         .AddGraphQLServer()
-        .AddQueryType<UserQueryType>()
-        .AddMutationType<UserMutationType>()
+        .AddQueryType<Query>()
+        .AddMutationType<Mutation>()
         .AddProjections();
 
       services.AddCors(options =>
@@ -52,6 +53,7 @@ namespace Magicord
                             builder.WithOrigins("http://localhost");
                           });
       });
+
       services.AddAutoMapper(typeof(Startup));
       services.AddControllers().AddNewtonsoftJson();
       services.AddHttpContextAccessor();
@@ -63,6 +65,8 @@ namespace Magicord
       services.AddDbContext<MagicordContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")).UseSnakeCaseNamingConvention());
 
       services.AddScoped<IUserService, UserService>();
+      services.AddScoped<IBoosterService, BoosterService>();
+      services.AddSingleton<Random>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
