@@ -7,5 +7,6 @@ namespace Magicord.Modules.Booster
   {
     List<Card> BuyBooster(long userId, string setCode);
     List<Card> GenerateBooster(string setCode);
+    BoosterStatsDto GetBoosterStats(string setCode);
   }
 }

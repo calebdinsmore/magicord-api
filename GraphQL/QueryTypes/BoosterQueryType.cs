@@ -12,5 +12,10 @@ namespace Magicord.GraphQL.QueryTypes
     {
       return boosterService.GenerateBooster(setCode);
     }
+
+    public BoosterStatsDto GetBoosterStats([Service] IBoosterService boosterService, string setCode)
+    {
+      return boosterService.GetBoosterStats(setCode);
+    }
   }
 }

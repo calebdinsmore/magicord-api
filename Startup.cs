@@ -22,6 +22,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Magicord.Core.ApiKeyAuthorization;
 
 namespace Magicord
 {
@@ -41,9 +45,11 @@ namespace Magicord
     {
       services
         .AddGraphQLServer()
+        .AddAuthorization()
         .AddQueryType<Query>()
         .AddMutationType<Mutation>()
-        .AddProjections();
+        .AddProjections()
+        .ModifyRequestOptions(o => o.ExecutionTimeout = TimeSpan.FromSeconds(3600));
 
       services.AddCors(options =>
       {
@@ -64,6 +70,26 @@ namespace Magicord
       services.Configure<ConfigSettings>(configurationSection);
       services.AddDbContext<MagicordContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")).UseSnakeCaseNamingConvention());
 
+      services.AddAuthentication(opt =>
+      {
+        opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+        opt.AddScheme<ApiKeyAuthenticationHandler>(ApiKeyDefaults.AuthenticationScheme, ApiKeyDefaults.AuthenticationScheme);
+      })
+      .AddJwtBearer(opt =>
+      {
+        opt.RequireHttpsMetadata = false;
+        opt.SaveToken = true;
+        opt.TokenValidationParameters = new TokenValidationParameters
+        {
+          ValidateIssuerSigningKey = true,
+          IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["ConfigSettings:Jwt:Key"])),
+          ValidateIssuer = false,
+          ValidateAudience = false
+        };
+      });
+
       services.AddScoped<IUserService, UserService>();
       services.AddScoped<IBoosterService, BoosterService>();
       services.AddSingleton<Random>();
@@ -78,14 +104,13 @@ namespace Magicord
 
 
       app.UseCors(MyAllowSpecificOrigins);
-
-      app
-        .UseRouting()
-        .UseEndpoints(endpoints =>
+      app.UseAuthentication();
+      app.UseRouting();
+      app.UseAuthorization();
+      app.UseEndpoints(endpoints =>
         {
           endpoints.MapGraphQL();
         });
-      // app.UseAuthorization();
 
       // app.UseEndpoints(endpoints =>
       // {

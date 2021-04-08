@@ -30,9 +30,10 @@ namespace Magicord.Controllers
 
     // GET api/users/5
     [HttpGet("{id}")]
+    [Authorize]
     public ActionResult<UserDto> GetUserById(int id)
     {
-      return null;
+      return new UserDto();
     }
 
     // POST api/users

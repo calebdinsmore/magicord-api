@@ -62,6 +62,7 @@ namespace Magicord.Modules.Booster
     {
       var sheet = boosterConfig.Sheets.GetValueOrDefault(sheetName);
 
+      var cardUuids = new List<string>();
       for (var i = 0; i < boosterContentConfig.Contents.GetValueOrDefault(sheetName); i++)
       {
         var randomValue = _random.Next(sheet.TotalWeight);
@@ -70,11 +71,13 @@ namespace Magicord.Modules.Booster
           randomValue -= sheet.Cards.GetValueOrDefault(cardUuid);
           if (randomValue < 0)
           {
-            cardList.Add(_dataContext.Cards.FirstOrDefault(x => x.Uuid == cardUuid));
+            cardUuids.Add(cardUuid);
+            // cardList.Add(_dataContext.Cards.Include(x => x.CardPrice).FirstOrDefault(x => x.Uuid == cardUuid));
             break;
           }
         }
       }
+      cardList.AddRange(_dataContext.Cards.Include(x => x.CardPrice).Where(x => cardUuids.Any(y => y == x.Uuid)));
     }
 
     public List<Card> BuyBooster(long userId, string setCode)
@@ -120,6 +123,40 @@ namespace Magicord.Modules.Booster
 
       _dataContext.SaveChanges();
       return boosterCards;
+    }
+
+    public BoosterStatsDto GetBoosterStats(string setCode)
+    {
+      var numberOfRuns = 300;
+      var boosterStats = new BoosterStatsDto
+      {
+        AverageBuylistPrice = 0,
+        AverageRetailPrice = 0
+      };
+      for (var i = 0; i < numberOfRuns; i++)
+      {
+        var booster = GenerateBooster(setCode);
+        decimal boosterTotalBuylist = 0;
+        decimal boosterTotalRetail = 0;
+        foreach (var card in booster)
+        {
+          if (card.HasNonFoil)
+          {
+            boosterTotalRetail += card.CardPrice.CurrentRetailNonFoil;
+            boosterTotalBuylist += card.CardPrice.CurrentBuylistNonFoil;
+          }
+          else
+          {
+            boosterTotalRetail += card.CardPrice.CurrentRetailFoil;
+            boosterTotalBuylist += card.CardPrice.CurrentBuylistFoil;
+          }
+        }
+        boosterStats.AverageBuylistPrice += boosterTotalBuylist;
+        boosterStats.AverageRetailPrice += boosterTotalRetail;
+      }
+      boosterStats.AverageBuylistPrice = boosterStats.AverageBuylistPrice / numberOfRuns;
+      boosterStats.AverageRetailPrice = boosterStats.AverageRetailPrice / numberOfRuns;
+      return boosterStats;
     }
   }
 }
