@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Magicord.Models;
 
 namespace Magicord.Modules.Booster
@@ -9,5 +10,6 @@ namespace Magicord.Modules.Booster
     List<BoosterCardDto> GenerateBooster(string setCode);
     BoosterStatsDto GetBoosterStats(string setCode);
     StoreBoosterListing AddBoosterListing(string setCode, decimal retailPrice);
+    IQueryable<StoreBoosterListing> GetStoreBoosterListings();
   }
 }

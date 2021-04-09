@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using HotChocolate.Execution;
 using Magicord.Core.Exceptions;
 using Magicord.Models;
 using Magicord.Modules.Core.Extension;
@@ -20,6 +21,11 @@ namespace Magicord.Modules.Booster
       _dataContext = dataContext;
       _mapper = mapper;
       _random = random;
+    }
+
+    public IQueryable<StoreBoosterListing> GetStoreBoosterListings()
+    {
+      return _dataContext.StoreBoosterListings.Where(x => x.IsActive);
     }
 
     public List<BoosterCardDto> GenerateBooster(string setCode)
@@ -92,17 +98,17 @@ namespace Magicord.Modules.Booster
 
       if (boosterListing == null)
       {
-        throw new ValidationFailureException($"Could not find a store booster listing matching set {setCode}");
+        throw new QueryException($"Could not find a store booster listing matching set {setCode}");
       }
 
       if (user == null)
       {
-        throw new ValidationFailureException($"Could not find a user with ID {userId}");
+        throw new QueryException($"User does not exist. Try `mc start`.");
       }
 
       if (user.Balance - boosterListing.RetailPrice < 0)
       {
-        throw new ValidationFailureException($"Insufficient funds to purchase booster.");
+        throw new QueryException($"Insufficient funds to purchase booster.");
       }
 
       user.Balance -= boosterListing.RetailPrice;
