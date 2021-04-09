@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using HotChocolate.Execution;
 using Magicord.Core.Exceptions;
 using Magicord.Models;
 using Magicord.Modules.Users.Dto;
@@ -56,6 +57,10 @@ namespace Magicord.Modules.Users
 
     public User CreateUser(CreateUserInputDto dto)
     {
+      if (GetUserById(dto.Id).Any())
+      {
+        throw new QueryException("User already exists.");
+      }
       var newUser = _mapper.Map<User>(dto);
       newUser.Balance = 50;
       _dataContext.Add(newUser);

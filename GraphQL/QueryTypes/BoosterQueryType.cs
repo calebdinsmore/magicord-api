@@ -8,7 +8,7 @@ namespace Magicord.GraphQL.QueryTypes
 {
   public partial class Query
   {
-    public List<Card> GetBoosterBySet([Service] IBoosterService boosterService, string setCode)
+    public List<BoosterCardDto> GetBoosterBySet([Service] IBoosterService boosterService, string setCode)
     {
       return boosterService.GenerateBooster(setCode);
     }

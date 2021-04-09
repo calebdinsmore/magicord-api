@@ -5,8 +5,9 @@ namespace Magicord.Modules.Booster
 {
   public interface IBoosterService
   {
-    List<Card> BuyBooster(long userId, string setCode);
-    List<Card> GenerateBooster(string setCode);
+    List<BoosterCardDto> BuyBooster(long userId, string setCode);
+    List<BoosterCardDto> GenerateBooster(string setCode);
     BoosterStatsDto GetBoosterStats(string setCode);
+    StoreBoosterListing AddBoosterListing(string setCode, decimal retailPrice);
   }
 }

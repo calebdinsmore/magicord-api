@@ -8,9 +8,14 @@ namespace Magicord.GraphQL.MutationTypes
 {
   public partial class Mutation
   {
-    public List<Card> BuyBooster([Service] IBoosterService boosterService, long userId, string setCode)
+    public List<BoosterCardDto> BuyBooster([Service] IBoosterService boosterService, long userId, string setCode)
     {
       return boosterService.BuyBooster(userId, setCode);
+    }
+
+    public StoreBoosterListing AddBoosterListing([Service] IBoosterService boosterService, string setCode, decimal retailPrice)
+    {
+      return boosterService.AddBoosterListing(setCode, retailPrice);
     }
   }
 }

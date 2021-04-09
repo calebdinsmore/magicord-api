@@ -22,9 +22,9 @@ namespace Magicord.Modules.Booster
       _random = random;
     }
 
-    public List<Card> GenerateBooster(string setCode)
+    public List<BoosterCardDto> GenerateBooster(string setCode)
     {
-      var boosterCardList = new List<Card>();
+      var boosterCardList = new List<BoosterCardDto>();
       var set = _dataContext.Sets.FirstOrDefault(x => x.Code == setCode);
       if (set != null && set.Booster != null)
       {
@@ -58,7 +58,7 @@ namespace Magicord.Modules.Booster
       throw new InvalidMagicordOperationException($"Unable to select booster for set (bad weight data?)");
     }
 
-    private void AddRandomCardsFromSheet(List<Card> cardList, string sheetName, BoosterConfig boosterConfig, BoosterContentConfig boosterContentConfig)
+    private void AddRandomCardsFromSheet(List<BoosterCardDto> cardList, string sheetName, BoosterConfig boosterConfig, BoosterContentConfig boosterContentConfig)
     {
       var sheet = boosterConfig.Sheets.GetValueOrDefault(sheetName);
 
@@ -72,15 +72,20 @@ namespace Magicord.Modules.Booster
           if (randomValue < 0)
           {
             cardUuids.Add(cardUuid);
-            // cardList.Add(_dataContext.Cards.Include(x => x.CardPrice).FirstOrDefault(x => x.Uuid == cardUuid));
             break;
           }
         }
       }
-      cardList.AddRange(_dataContext.Cards.Include(x => x.CardPrice).Where(x => cardUuids.Any(y => y == x.Uuid)));
+      var boosterCards = _dataContext.Cards.Include(x => x.CardPrice).Where(x => cardUuids.Any(y => y == x.Uuid))
+        .Select(x => new BoosterCardDto
+        {
+          Card = x,
+          Foil = sheet.Foil
+        });
+      cardList.AddRange(boosterCards);
     }
 
-    public List<Card> BuyBooster(long userId, string setCode)
+    public List<BoosterCardDto> BuyBooster(long userId, string setCode)
     {
       var boosterListing = _dataContext.StoreBoosterListings.FirstOrDefault(x => x.SetCode == setCode);
       var user = _dataContext.Users.Include(x => x.UserCards).FirstOrDefault(x => x.Id == userId);
@@ -103,20 +108,25 @@ namespace Magicord.Modules.Booster
       user.Balance -= boosterListing.RetailPrice;
       var boosterCards = GenerateBooster(setCode);
 
-      foreach (var card in boosterCards)
+      foreach (var boosterCard in boosterCards)
       {
-        var userCard = user.UserCards.FirstOrDefault(x => x.CardUuid == card.Uuid);
+        var userCard = user.UserCards.FirstOrDefault(x => x.CardUuid == boosterCard.Card.Uuid);
         if (userCard != null)
         {
           userCard.Quantity += 1;
+          if (boosterCard.Foil)
+          {
+            userCard.AmountFoil += 1;
+          }
         }
         else
         {
           user.UserCards.Add(new UserCard
           {
             UserId = user.Id,
-            CardUuid = card.Uuid,
-            Quantity = 1
+            CardUuid = boosterCard.Card.Uuid,
+            Quantity = 1,
+            AmountFoil = boosterCard.Foil ? 1 : 0
           });
         }
       }
@@ -135,20 +145,20 @@ namespace Magicord.Modules.Booster
       };
       for (var i = 0; i < numberOfRuns; i++)
       {
-        var booster = GenerateBooster(setCode);
+        var boosterCards = GenerateBooster(setCode);
         decimal boosterTotalBuylist = 0;
         decimal boosterTotalRetail = 0;
-        foreach (var card in booster)
+        foreach (var boosterCard in boosterCards)
         {
-          if (card.HasNonFoil)
+          if (boosterCard.Foil)
           {
-            boosterTotalRetail += card.CardPrice.CurrentRetailNonFoil;
-            boosterTotalBuylist += card.CardPrice.CurrentBuylistNonFoil;
+            boosterTotalBuylist += boosterCard.Card.CardPrice.CurrentBuylistFoil;
+            boosterTotalRetail += boosterCard.Card.CardPrice.CurrentRetailFoil;
           }
           else
           {
-            boosterTotalRetail += card.CardPrice.CurrentRetailFoil;
-            boosterTotalBuylist += card.CardPrice.CurrentBuylistFoil;
+            boosterTotalRetail += boosterCard.Card.CardPrice.CurrentRetailNonFoil;
+            boosterTotalBuylist += boosterCard.Card.CardPrice.CurrentBuylistNonFoil;
           }
         }
         boosterStats.AverageBuylistPrice += boosterTotalBuylist;
@@ -157,6 +167,30 @@ namespace Magicord.Modules.Booster
       boosterStats.AverageBuylistPrice = boosterStats.AverageBuylistPrice / numberOfRuns;
       boosterStats.AverageRetailPrice = boosterStats.AverageRetailPrice / numberOfRuns;
       return boosterStats;
+    }
+
+    public StoreBoosterListing AddBoosterListing(string setCode, decimal retailPrice)
+    {
+      if (_dataContext.Sets.FirstOrDefault(x => x.Code == setCode) == null)
+      {
+        throw new ValidationFailureException($"Set code {setCode} does not exist.");
+      }
+
+      if (retailPrice < 0)
+      {
+        throw new ValidationFailureException("Retail price cannot be negative.");
+      }
+
+      var entity = new StoreBoosterListing
+      {
+        SetCode = setCode,
+        RetailPrice = retailPrice,
+        IsActive = true
+      };
+
+      _dataContext.Add(entity);
+      _dataContext.SaveChanges();
+      return entity;
     }
   }
 }
