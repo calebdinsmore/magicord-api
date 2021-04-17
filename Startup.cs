@@ -26,6 +26,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Magicord.Core.ApiKeyAuthorization;
+using Magicord.Modules.Trivia;
 
 namespace Magicord
 {
@@ -92,6 +93,7 @@ namespace Magicord
 
       services.AddScoped<IUserService, UserService>();
       services.AddScoped<IBoosterService, BoosterService>();
+      services.AddScoped<ITriviaGeneratorFactory, TriviaGeneratorFactory>();
       services.AddSingleton<Random>();
     }
 
