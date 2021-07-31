@@ -11,5 +11,10 @@ namespace Magicord.GraphQL.MutationTypes
     {
       return userService.CreateUser(input);
     }
+
+    public User AddToUserBalance([Service] IUserService userService, AddToUserBalanceInputDto input)
+    {
+      return userService.AddToUserBalance(input);
+    }
   }
 }

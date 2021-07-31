@@ -6,6 +6,7 @@ using HotChocolate.Execution;
 using Magicord.Core.Exceptions;
 using Magicord.Models;
 using Magicord.Modules.Users.Dto;
+using Microsoft.EntityFrameworkCore;
 
 namespace Magicord.Modules.Users
 {
@@ -76,6 +77,39 @@ namespace Magicord.Modules.Users
     public IQueryable<User> GetUserById(long id)
     {
       return _dataContext.Users.Where(x => x.Id == id);
+    }
+
+    public User AddToUserBalance(AddToUserBalanceInputDto dto)
+    {
+      var user = _dataContext.Users.Find(dto.Id);
+      if (user == null)
+      {
+        throw new QueryException("User doesn't exist.");
+      }
+      user.Balance += dto.Balance;
+      _dataContext.Update(user);
+      _dataContext.SaveChanges();
+      return user;
+    }
+
+    public UserStatsDto GetUserStats(long id)
+    {
+      var user = _dataContext.Users.Include(x => x.UserCards).ThenInclude(x => x.Card).ThenInclude(x => x.CardPrice).Where(x => x.Id == id).FirstOrDefault();
+      return new UserStatsDto
+      {
+        Balance = user.Balance,
+        NetWorth = user.Balance + user.UserCards.Sum(x => (x.Card.CardPrice.CurrentBuylistNonFoil * (x.Quantity - x.AmountFoil)) + (x.Card.CardPrice.CurrentBuylistFoil * (x.AmountFoil))),
+        NumberOfCardsOwned = user.UserCards.Sum(x => x.Quantity)
+      };
+    }
+
+    public IQueryable<UserCard> GetUserCardsById(long id)
+    {
+      return _dataContext.Users
+        .Include(x => x.UserCards)
+        .ThenInclude(x => x.Card)
+        .FirstOrDefault(x => x.Id == id)
+        ?.UserCards.AsQueryable();
     }
   }
 }
