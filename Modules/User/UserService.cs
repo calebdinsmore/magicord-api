@@ -98,8 +98,8 @@ namespace Magicord.Modules.Users
       return new UserStatsDto
       {
         Balance = user.Balance,
-        NetWorth = user.Balance + user.UserCards.Sum(x => (x.Card.CardPrice.CurrentBuylistNonFoil * (x.Quantity - x.AmountFoil)) + (x.Card.CardPrice.CurrentBuylistFoil * (x.AmountFoil))),
-        NumberOfCardsOwned = user.UserCards.Sum(x => x.Quantity)
+        NetWorth = user.Balance + user.UserCards.Sum(x => (x.Card.CardPrice.CurrentBuylistNonFoil * x.AmountNonFoil) + (x.Card.CardPrice.CurrentBuylistFoil * x.AmountFoil)),
+        NumberOfCardsOwned = user.UserCards.Sum(x => x.AmountFoil + x.AmountNonFoil)
       };
     }
 

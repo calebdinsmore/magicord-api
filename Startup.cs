@@ -27,6 +27,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Magicord.Core.ApiKeyAuthorization;
 using Magicord.Modules.Trivia;
+using Magicord.Modules.Shop;
 
 namespace Magicord
 {
@@ -94,6 +95,7 @@ namespace Magicord
       services.AddScoped<IUserService, UserService>();
       services.AddScoped<IBoosterService, BoosterService>();
       services.AddScoped<ITriviaGeneratorFactory, TriviaGeneratorFactory>();
+      services.AddScoped<IShopService, ShopService>();
       services.AddSingleton<Random>();
     }
 
@@ -112,12 +114,8 @@ namespace Magicord
       app.UseEndpoints(endpoints =>
         {
           endpoints.MapGraphQL();
+          endpoints.MapControllers();
         });
-
-      // app.UseEndpoints(endpoints =>
-      // {
-      //   endpoints.MapControllers();
-      // });
     }
   }
 }

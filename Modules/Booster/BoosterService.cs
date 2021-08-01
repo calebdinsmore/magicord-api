@@ -119,10 +119,13 @@ namespace Magicord.Modules.Booster
         var userCard = user.UserCards.FirstOrDefault(x => x.CardUuid == boosterCard.Card.Uuid);
         if (userCard != null)
         {
-          userCard.Quantity += 1;
           if (boosterCard.Foil)
           {
-            userCard.AmountFoil += 1;
+            userCard.AmountFoil++;
+          }
+          else
+          {
+            userCard.AmountNonFoil++;
           }
         }
         else
@@ -131,8 +134,9 @@ namespace Magicord.Modules.Booster
           {
             UserId = user.Id,
             CardUuid = boosterCard.Card.Uuid,
-            Quantity = 1,
-            AmountFoil = boosterCard.Foil ? 1 : 0
+            Quantity = 0,
+            AmountFoil = boosterCard.Foil ? 1 : 0,
+            AmountNonFoil = boosterCard.Foil ? 0 : 1
           });
         }
       }
@@ -143,7 +147,7 @@ namespace Magicord.Modules.Booster
 
     public BoosterStatsDto GetBoosterStats(string setCode)
     {
-      var numberOfRuns = 300;
+      var numberOfRuns = 100;
       var boosterStats = new BoosterStatsDto
       {
         AverageBuylistPrice = 0,
