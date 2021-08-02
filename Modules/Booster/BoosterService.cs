@@ -68,7 +68,8 @@ namespace Magicord.Modules.Booster
     {
       var sheet = boosterConfig.Sheets.GetValueOrDefault(sheetName);
 
-      var cardUuids = new List<string>();
+      // var cardUuids = new List<string>();
+      var cardUuids = new Dictionary<string, int>();
       for (var i = 0; i < boosterContentConfig.Contents.GetValueOrDefault(sheetName); i++)
       {
         var randomValue = _random.Next(sheet.TotalWeight);
@@ -77,12 +78,20 @@ namespace Magicord.Modules.Booster
           randomValue -= sheet.Cards.GetValueOrDefault(cardUuid);
           if (randomValue < 0)
           {
-            cardUuids.Add(cardUuid);
+            if (cardUuids.ContainsKey(cardUuid))
+            {
+              // retry grabbing card
+              i--;
+              break;
+            }
+
+            cardUuids.Add(cardUuid, 1);
             break;
           }
         }
       }
-      var boosterCards = _dataContext.Cards.Include(x => x.CardPrice).Where(x => cardUuids.Any(y => y == x.Uuid))
+      var cardUuidList = cardUuids.Keys.ToList();
+      var boosterCards = _dataContext.Cards.Include(x => x.CardPrice).Where(x => cardUuidList.Any(y => y == x.Uuid))
         .Select(x => new BoosterCardDto
         {
           Card = x,
