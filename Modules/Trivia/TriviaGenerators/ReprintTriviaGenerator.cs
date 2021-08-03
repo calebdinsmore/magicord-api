@@ -26,7 +26,7 @@ namespace Magicord.Modules.Trivia
         Question = $"In what set was {card.Name} first reprinted?",
         Answer = $"{correctSet.Name} ({correctSet.Code})",
         Choices = GetChoices(correctSet, card),
-        Reward = 20,
+        Reward = 18,
         CardSubject = card,
         SetSubject = correctSet
       };
@@ -35,7 +35,7 @@ namespace Magicord.Modules.Trivia
     private Card GetRandomCard()
     {
       return _dataContext.Cards.Include(x => x.SetCodeNavigation).Include(x => x.CardPrice)
-      .Where(x => x.Printings.Length > 11 && x.CardPrice.CurrentRetailNonFoil > 3)
+      .Where(x => x.Printings.Length > 11 && x.CardPrice.CurrentRetailNonFoil > 3 && !x.Type.Contains("Basic Land"))
       .OrderBy(x => Guid.NewGuid())
       .Take(1).FirstOrDefault();
     }
