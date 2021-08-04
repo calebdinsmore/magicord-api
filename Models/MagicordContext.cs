@@ -57,7 +57,7 @@ namespace Magicord.Models
       modelBuilder.HasPostgresEnum("dbo", "cards_border_color", new[] { "black", "white", "borderless", "silver", "gold" })
           .HasPostgresEnum("dbo", "cards_frame_version", new[] { "2003", "1993", "2015", "1997", "future" })
           .HasPostgresEnum("dbo", "cards_layout", new[] { "normal", "aftermath", "split", "flip", "leveler", "saga", "vanguard", "transform", "adventure", "meld", "scheme", "planar", "host", "augment" })
-          .HasPostgresEnum("dbo", "cards_rarity", new[] { "rare", "uncommon", "common", "mythic" })
+          .HasPostgresEnum("dbo", "cards_rarity", new[] { "rare", "uncommon", "common", "mythic", "special", "bonus" })
           .HasPostgresEnum("dbo", "foreign_data_language", new[] { "German", "Spanish", "French", "Italian", "Japanese", "Portuguese (Brazil)", "Russian", "Chinese Simplified", "Korean", "Chinese Traditional", "Phyrexian", "Sanskrit", "Hebrew", "Ancient Greek", "Latin", "Arabic" })
           .HasPostgresEnum("dbo", "legalities_format", new[] { "commander", "duel", "legacy", "modern", "vintage", "pauper", "penny", "historic", "pioneer", "brawl", "future", "standard", "oldschool" })
           .HasPostgresEnum("dbo", "legalities_status", new[] { "Legal", "Banned", "Restricted" })

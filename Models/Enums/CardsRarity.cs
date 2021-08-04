@@ -5,6 +5,8 @@ namespace Magicord.Models.Enums
     Common,
     Uncommon,
     Rare,
-    Mythic
+    Mythic,
+    Special,
+    Bonus
   }
 }

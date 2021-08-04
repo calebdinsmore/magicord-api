@@ -14,14 +14,14 @@ namespace Magicord.Modules.Trivia
     }
     public ITriviaGenerator GetRandomTriviaGenerator()
     {
-      switch (_random.Next(3))
+      switch (_random.Next(2))
       {
         case 0:
           return new ColorIdentityTriviaGenerator(_dataContext, _random);
         case 1:
-          return new ReprintTriviaGenerator(_dataContext, _random);
-        case 2:
           return new FlavorTextTriviaGenerator(_dataContext, _random);
+          // case 2:
+          // return new ReprintTriviaGenerator(_dataContext, _random);
       }
 
       return new ColorIdentityTriviaGenerator(_dataContext, _random);

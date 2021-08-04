@@ -28,6 +28,7 @@ using System.Text;
 using Magicord.Core.ApiKeyAuthorization;
 using Magicord.Modules.Trivia;
 using Magicord.Modules.Shop;
+using Magicord.Modules.AdminProcess;
 
 namespace Magicord
 {
@@ -96,6 +97,7 @@ namespace Magicord
       services.AddScoped<IBoosterService, BoosterService>();
       services.AddScoped<ITriviaGeneratorFactory, TriviaGeneratorFactory>();
       services.AddScoped<IShopService, ShopService>();
+      services.AddScoped<IAdminProcessService, AdminProcessService>();
       services.AddSingleton<Random>();
     }
 
