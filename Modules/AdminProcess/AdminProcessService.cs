@@ -59,13 +59,13 @@ namespace Magicord.Modules.AdminProcess
 
     private int PersistCardPrices(AllPricesJson allPricesJson)
     {
+      var cardUuidDict = new Dictionary<string, bool>();
+      foreach (var uuid in _dataContext.Cards.Select(x => x.Uuid).ToList())
+      {
+        cardUuidDict.Add(uuid, true);
+      }
       foreach (var cardUuid in allPricesJson.Data.Keys)
       {
-        var cardUuidDict = new Dictionary<string, bool>();
-        foreach (var uuid in _dataContext.Cards.Select(x => x.Uuid).ToList())
-        {
-          cardUuidDict.Add(uuid, true);
-        }
         if (!cardUuidDict.ContainsKey(cardUuid))
         {
           continue;
