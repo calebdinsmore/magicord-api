@@ -24,7 +24,7 @@ namespace Magicord.Modules.Shop
         throw new QueryException("Can't find user. Have you done `mc start`?");
       }
 
-      var userCard = user.UserCards.FirstOrDefault(x => x.Card.Name.ToLower() == input.CardName.ToLower());
+      var userCard = user.UserCards.FirstOrDefault(x => x.Card.Name.ToLower() == input.CardName.ToLower() && x.AmountFoil + x.AmountNonFoil > 0);
       if (userCard == null)
       {
         throw new QueryException($"Could not find a card belonging to you matching '{input.CardName}'.");

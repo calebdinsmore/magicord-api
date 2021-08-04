@@ -156,7 +156,7 @@ namespace Magicord.Modules.Booster
 
     public BoosterStatsDto GetBoosterStats(string setCode)
     {
-      var numberOfRuns = 100;
+      var numberOfRuns = 200;
       var boosterStats = new BoosterStatsDto
       {
         AverageBuylistPrice = 0,
