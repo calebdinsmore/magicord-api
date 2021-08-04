@@ -26,9 +26,9 @@ namespace Magicord.Modules.AdminProcess
     {
       try
       {
-        var allPrintings = await GetAllPrintingsJson();
-        var sets = GetNewSets(allPrintings);
-        PersistSets(sets);
+        // var allPrintings = await GetAllPrintingsJson();
+        // var sets = GetNewSets(allPrintings);
+        // PersistSets(sets);
         var allPrices = await GetAllPricesJson();
         PersistCardPrices(allPrices);
         CreateBlankCardPrices();
