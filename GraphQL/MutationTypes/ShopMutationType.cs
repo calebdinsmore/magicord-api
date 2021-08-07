@@ -10,5 +10,10 @@ namespace Magicord.GraphQL.MutationTypes
     {
       return shopService.BuylistCard(input);
     }
+
+    public BuylistAllResultDto BuylistAll([Service] IShopService shopService, long userId)
+    {
+      return shopService.BuylistAll(userId);
+    }
   }
 }

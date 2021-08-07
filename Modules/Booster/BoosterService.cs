@@ -103,12 +103,13 @@ namespace Magicord.Modules.Booster
     public List<BoosterCardDto> BuyBooster(long userId, string setCode)
     {
       var boosterListing = _dataContext.StoreBoosterListings.FirstOrDefault(x => x.SetCode == setCode);
-      var user = _dataContext.Users.Include(x => x.UserCards).FirstOrDefault(x => x.Id == userId);
 
       if (boosterListing == null)
       {
         throw new QueryException($"Could not find a store booster listing matching set {setCode}");
       }
+      var boosterCards = GenerateBooster(setCode);
+      var user = _dataContext.Users.Include(x => x.UserCards).FirstOrDefault(x => x.Id == userId);
 
       if (user == null)
       {
@@ -121,7 +122,6 @@ namespace Magicord.Modules.Booster
       }
 
       user.Balance -= boosterListing.RetailPrice;
-      var boosterCards = GenerateBooster(setCode);
 
       foreach (var boosterCard in boosterCards)
       {

@@ -16,6 +16,31 @@ namespace Magicord.Modules.Shop
       _mapper = mapper;
     }
 
+    public BuylistAllResultDto BuylistAll(long userId)
+    {
+      var user = _dataContext.Users.Include(x => x.UserCards).ThenInclude(x => x.Card).ThenInclude(x => x.CardPrice).Where(x => x.Id == userId).FirstOrDefault();
+      if (user == null)
+      {
+        throw new QueryException("User not found. Have you done `mc start`?");
+      }
+      var totalPayout = 0M;
+      var numCardsSold = user.UserCards.Count;
+      foreach (var userCard in user.UserCards)
+      {
+        var foilPayout = userCard.AmountFoil * userCard.Card.CardPrice.CurrentBuylistFoil;
+        var nonFoilPayout = userCard.AmountNonFoil * userCard.Card.CardPrice.CurrentBuylistNonFoil;
+        totalPayout += foilPayout + nonFoilPayout;
+      }
+      user.Balance += totalPayout;
+      _dataContext.RemoveRange(user.UserCards);
+      _dataContext.SaveChanges();
+      return new BuylistAllResultDto
+      {
+        NumCardsSold = numCardsSold,
+        TotalPayout = totalPayout
+      };
+    }
+
     public Card BuylistCard(BuylistCardInputDto input)
     {
       var user = _dataContext.Users.Include(x => x.UserCards).ThenInclude(x => x.Card).ThenInclude(x => x.CardPrice).FirstOrDefault(x => x.Id == input.UserId);

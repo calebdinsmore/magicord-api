@@ -8,11 +8,26 @@ using Magicord.Modules.Booster;
 
 namespace Magicord.GraphQL.QueryTypes
 {
+  public class Test
+  {
+    public decimal Value { get; set; }
+    public List<BoosterCardDto> Cards { get; set; }
+  }
   public partial class Query
   {
     public List<BoosterCardDto> GetBoosterBySet([Service] IBoosterService boosterService, string setCode)
     {
       return boosterService.GenerateBooster(setCode);
+    }
+
+    public Test GetBoosterValueBySet([Service] IBoosterService boosterService, string setCode)
+    {
+      var booster = boosterService.GenerateBooster(setCode);
+      return new Test
+      {
+        Value = booster.Sum(x => x.Card.CardPrice.CurrentBuylistNonFoil),
+        Cards = booster
+      };
     }
 
     public BoosterStatsDto GetBoosterStats([Service] IBoosterService boosterService, string setCode)
