@@ -24,12 +24,13 @@ namespace Magicord.Modules.Shop
         throw new QueryException("User not found. Have you done `mc start`?");
       }
       var totalPayout = 0M;
-      var numCardsSold = user.UserCards.Count;
+      var numCardsSold = 0;
       foreach (var userCard in user.UserCards)
       {
         var foilPayout = userCard.AmountFoil * userCard.Card.CardPrice.CurrentBuylistFoil;
         var nonFoilPayout = userCard.AmountNonFoil * userCard.Card.CardPrice.CurrentBuylistNonFoil;
         totalPayout += foilPayout + nonFoilPayout;
+        numCardsSold += userCard.AmountFoil + userCard.AmountNonFoil;
       }
       user.Balance += totalPayout;
       _dataContext.RemoveRange(user.UserCards);
