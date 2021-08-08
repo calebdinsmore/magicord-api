@@ -100,6 +100,28 @@ namespace Magicord.Modules.Booster
       cardList.AddRange(boosterCards);
     }
 
+    public List<BoosterCardDto> BuyRandomBooster(long userId)
+    {
+      var user = _dataContext.Users.FirstOrDefault(x => x.Id == userId);
+      if (user == null)
+      {
+        throw new QueryException($"User does not exist. Try `mc start`.");
+      }
+
+      var boosterListing = _dataContext.StoreBoosterListings
+      .Where(x => x.RetailPrice <= user.Balance)
+      .OrderBy(x => Guid.NewGuid())
+      .Take(1)
+      .FirstOrDefault();
+
+      if (boosterListing == null)
+      {
+        throw new QueryException("Unable to get a random booster within your budget. You broke?");
+      }
+
+      return BuyBooster(userId, boosterListing.SetCode);
+    }
+
     public List<BoosterCardDto> BuyBooster(long userId, string setCode)
     {
       var boosterListing = _dataContext.StoreBoosterListings.FirstOrDefault(x => x.SetCode == setCode);

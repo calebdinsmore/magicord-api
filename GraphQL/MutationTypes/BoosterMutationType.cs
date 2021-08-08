@@ -13,6 +13,11 @@ namespace Magicord.GraphQL.MutationTypes
       return boosterService.BuyBooster(userId, setCode);
     }
 
+    public List<BoosterCardDto> BuyRandomBooster([Service] IBoosterService boosterService, long userId)
+    {
+      return boosterService.BuyRandomBooster(userId);
+    }
+
     public StoreBoosterListing AddBoosterListing([Service] IBoosterService boosterService, string setCode, decimal retailPrice)
     {
       return boosterService.AddBoosterListing(setCode, retailPrice);
