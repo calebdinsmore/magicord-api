@@ -7,6 +7,8 @@ namespace Magicord.Modules.Shop
   {
     Card BuylistCard(BuylistCardInputDto input);
 
-    BuylistAllResultDto BuylistAll(long userId);
+    BuylistBulkResultDto BuylistAll(long userId);
+
+    BuylistBulkResultDto BuylistExtra(long userId);
   }
 }

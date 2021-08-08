@@ -2,6 +2,7 @@ using AutoMapper;
 using HotChocolate.Execution;
 using Magicord.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Magicord.Modules.Shop
@@ -16,7 +17,7 @@ namespace Magicord.Modules.Shop
       _mapper = mapper;
     }
 
-    public BuylistAllResultDto BuylistAll(long userId)
+    public BuylistBulkResultDto BuylistAll(long userId)
     {
       var user = _dataContext.Users.Include(x => x.UserCards).ThenInclude(x => x.Card).ThenInclude(x => x.CardPrice).Where(x => x.Id == userId).FirstOrDefault();
       if (user == null)
@@ -35,7 +36,7 @@ namespace Magicord.Modules.Shop
       user.Balance += totalPayout;
       _dataContext.RemoveRange(user.UserCards);
       _dataContext.SaveChanges();
-      return new BuylistAllResultDto
+      return new BuylistBulkResultDto
       {
         NumCardsSold = numCardsSold,
         TotalPayout = totalPayout
@@ -69,6 +70,61 @@ namespace Magicord.Modules.Shop
 
       _dataContext.SaveChanges();
       return userCard.Card;
+    }
+
+    public BuylistBulkResultDto BuylistExtra(long userId)
+    {
+      var exceptionCards = new List<string>(new string[]
+      {
+        "Persistent Petitioners",
+        "Relentless Rats",
+        "Dragon's Approach",
+        "Rat Colony",
+        "Shadowborn Apostle",
+        "Seven Dwarves"
+      });
+
+      var user = _dataContext.Users.Include(x => x.UserCards).ThenInclude(x => x.Card).ThenInclude(x => x.CardPrice).FirstOrDefault(x => x.Id == userId);
+      if (user == null)
+      {
+        throw new QueryException("Can't find user. Have you done `mc start`?");
+      }
+
+      var extraCards = user.UserCards
+        .Where(x =>
+          (x.Card.Supertypes == null || !x.Card.Supertypes.StartsWith("Basic"))
+          && !exceptionCards.Contains(x.Card.Name)
+          && (x.AmountFoil > 4 || x.AmountNonFoil > 4));
+
+      var totalPayout = 0M;
+      var numCardsSold = 0;
+      foreach (var userCard in extraCards)
+      {
+        if (userCard.AmountNonFoil > 4)
+        {
+          var amountToSell = userCard.AmountNonFoil - 4;
+          var payout = amountToSell * userCard.Card.CardPrice.CurrentBuylistNonFoil;
+          user.Balance += payout;
+          totalPayout += payout;
+          numCardsSold += amountToSell;
+          userCard.AmountNonFoil = 4;
+        }
+        if (userCard.AmountFoil > 4)
+        {
+          var amountToSell = userCard.AmountFoil - 4;
+          var payout = amountToSell * userCard.Card.CardPrice.CurrentBuylistFoil;
+          user.Balance += payout;
+          totalPayout += payout;
+          numCardsSold += amountToSell;
+          userCard.AmountFoil = 4;
+        }
+      }
+      _dataContext.SaveChanges();
+      return new BuylistBulkResultDto
+      {
+        NumCardsSold = numCardsSold,
+        TotalPayout = totalPayout
+      };
     }
   }
 }
