@@ -18,6 +18,11 @@ namespace Magicord.GraphQL.MutationTypes
       return boosterService.BuyRandomBooster(userId);
     }
 
+    public List<BoosterPackDto> BuyMultipleBoosters([Service] IBoosterService boosterService, long userId, string setCode, int count)
+    {
+      return boosterService.BuyMultipleBoosters(userId, setCode, count);
+    }
+
     public StoreBoosterListing AddBoosterListing([Service] IBoosterService boosterService, string setCode, decimal retailPrice)
     {
       return boosterService.AddBoosterListing(setCode, retailPrice);

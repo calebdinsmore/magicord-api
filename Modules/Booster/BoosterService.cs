@@ -122,6 +122,24 @@ namespace Magicord.Modules.Booster
       return BuyBooster(userId, boosterListing.SetCode);
     }
 
+    public List<BoosterPackDto> BuyMultipleBoosters(long userId, string setCode, int count)
+    {
+      if (count > 10)
+      {
+        throw new QueryException("You are not allowed to buy more than 10 boosters at a time.");
+      }
+
+      var packs = new List<BoosterPackDto>();
+      for (var i = 0; i < count; i++)
+      {
+        packs.Add(new BoosterPackDto
+        {
+          Cards = BuyBooster(userId, setCode)
+        });
+      }
+      return packs;
+    }
+
     public List<BoosterCardDto> BuyBooster(long userId, string setCode)
     {
       var boosterListing = _dataContext.StoreBoosterListings.FirstOrDefault(x => x.SetCode == setCode);
