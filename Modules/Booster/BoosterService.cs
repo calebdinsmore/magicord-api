@@ -132,10 +132,21 @@ namespace Magicord.Modules.Booster
       var packs = new List<BoosterPackDto>();
       for (var i = 0; i < count; i++)
       {
-        packs.Add(new BoosterPackDto
+        try
         {
-          Cards = BuyBooster(userId, setCode)
-        });
+          packs.Add(new BoosterPackDto
+          {
+            Cards = BuyBooster(userId, setCode)
+          });
+        }
+        catch (QueryException)
+        {
+          if (!packs.Any())
+          {
+            throw;
+          }
+          return packs;
+        }
       }
       return packs;
     }
