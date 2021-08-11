@@ -52,7 +52,7 @@ namespace Magicord
         .AddQueryType<Query>()
         .AddMutationType<Mutation>()
         .AddProjections()
-        .ModifyRequestOptions(o => o.ExecutionTimeout = TimeSpan.FromSeconds(3600));
+        .ModifyRequestOptions(o => o.ExecutionTimeout = TimeSpan.FromSeconds(10800));
 
       services.AddCors(options =>
       {

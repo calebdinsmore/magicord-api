@@ -194,19 +194,36 @@ namespace Magicord.Modules.Booster
       return boosterCards;
     }
 
+    public List<BoosterStatsDto> GetBoosterStatsForAllSetListings()
+    {
+      var statsList = new List<BoosterStatsDto>();
+      var storeListings = _dataContext.StoreBoosterListings.Where(x => x.IsActive).ToList();
+      foreach (var listing in storeListings)
+      {
+        statsList.Add(GetBoosterStats(listing.SetCode));
+        Console.WriteLine($"Finished {listing.SetCode}");
+      }
+      return statsList;
+    }
+
     public BoosterStatsDto GetBoosterStats(string setCode)
     {
-      var numberOfRuns = 200;
+      var numberOfRuns = 800;
       var boosterStats = new BoosterStatsDto
       {
+        SetCode = setCode,
         AverageBuylistPrice = 0,
-        AverageRetailPrice = 0
+        AverageRetailPrice = 0,
+        BuylistPrices = new List<decimal>(),
+        RetailPrices = new List<decimal>()
       };
       for (var i = 0; i < numberOfRuns; i++)
       {
         var boosterCards = GenerateBooster(setCode);
         decimal boosterTotalBuylist = 0;
         decimal boosterTotalRetail = 0;
+        boosterStats.BuylistPrices.Add(boosterCards.Sum(x => x.Foil ? x.Card.CardPrice.CurrentBuylistFoil : x.Card.CardPrice.CurrentBuylistNonFoil));
+        boosterStats.RetailPrices.Add(boosterCards.Sum(x => x.Foil ? x.Card.CardPrice.CurrentRetailFoil : x.Card.CardPrice.CurrentRetailNonFoil));
         foreach (var boosterCard in boosterCards)
         {
           if (boosterCard.Foil)
