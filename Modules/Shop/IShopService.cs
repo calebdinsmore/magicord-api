@@ -5,7 +5,7 @@ namespace Magicord.Modules.Shop
 {
   public interface IShopService
   {
-    Card BuylistCard(BuylistCardInputDto input);
+    BuylistCardResultDto BuylistCard(BuylistCardInputDto input);
 
     BuylistBulkResultDto BuylistAll(long userId);
 
