@@ -39,6 +39,7 @@ namespace Magicord.Models
     public virtual DbSet<CardPrice> CardPrices { get; set; }
     public virtual DbSet<UserBooster> UserBoosters { get; set; }
     public virtual DbSet<StoreBoosterListing> StoreBoosterListings { get; set; }
+    public virtual DbSet<SealedEvent> SealedEvents { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -569,6 +570,17 @@ namespace Magicord.Models
 
         entity.Property(sbl => sbl.BoosterType).HasDefaultValue("default");
       });
+
+      modelBuilder.Entity<SealedEventPack>(entity =>
+      {
+        entity.HasOne(sep => sep.Set)
+          .WithMany(s => s.SealedEventPacks)
+          .HasPrincipalKey(s => s.Code)
+          .HasForeignKey(sep => sep.SetCode);
+      });
+
+      modelBuilder.Entity<SealedEventAttendee>()
+        .HasKey(sea => new { sea.UserId, sea.SealedEventId });
 
       OnModelCreatingPartial(modelBuilder);
     }

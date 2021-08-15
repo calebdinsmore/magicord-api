@@ -41,5 +41,6 @@ namespace Magicord.Models
     public virtual ICollection<Token> Tokens { get; set; }
     public virtual ICollection<UserBooster> UserBoosters { get; set; }
     public virtual ICollection<StoreBoosterListing> StoreBoosterListings { get; set; }
+    public virtual ICollection<SealedEventPack> SealedEventPacks { get; set; }
   }
 }
