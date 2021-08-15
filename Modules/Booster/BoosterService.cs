@@ -151,6 +151,30 @@ namespace Magicord.Modules.Booster
       return packs;
     }
 
+    public List<BoosterPackDto> GenerateMultipleBoosters(string setCode, int count)
+    {
+      var packs = new List<BoosterPackDto>();
+      for (var i = 0; i < count; i++)
+      {
+        try
+        {
+          packs.Add(new BoosterPackDto
+          {
+            Cards = GenerateBooster(setCode)
+          });
+        }
+        catch (QueryException)
+        {
+          if (!packs.Any())
+          {
+            throw;
+          }
+          return packs;
+        }
+      }
+      return packs;
+    }
+
     public List<BoosterCardDto> BuyBooster(long userId, string setCode)
     {
       var boosterListing = _dataContext.StoreBoosterListings.FirstOrDefault(x => x.SetCode == setCode);
@@ -174,6 +198,14 @@ namespace Magicord.Modules.Booster
 
       user.Balance -= boosterListing.RetailPrice;
 
+      AddBoosterCardsToUser(boosterCards, user);
+
+      _dataContext.SaveChanges();
+      return boosterCards;
+    }
+
+    public void AddBoosterCardsToUser(List<BoosterCardDto> boosterCards, User user)
+    {
       foreach (var boosterCard in boosterCards)
       {
         var userCard = user.UserCards.FirstOrDefault(x => x.CardUuid == boosterCard.Card.Uuid);
@@ -200,9 +232,6 @@ namespace Magicord.Modules.Booster
           });
         }
       }
-
-      _dataContext.SaveChanges();
-      return boosterCards;
     }
 
     public List<BoosterStatsDto> GetBoosterStatsForAllSetListings()

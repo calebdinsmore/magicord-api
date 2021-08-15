@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Magicord.Modules.Booster
 {
@@ -9,5 +11,12 @@ namespace Magicord.Modules.Booster
     public decimal AverageRetailPrice { get; set; }
     public List<decimal> BuylistPrices { get; set; }
     public List<decimal> RetailPrices { get; set; }
+    public decimal AverageBuylist
+    {
+      get
+      {
+        return BuylistPrices.Sum() / BuylistPrices.Count;
+      }
+    }
   }
 }
