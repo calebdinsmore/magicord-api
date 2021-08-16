@@ -29,6 +29,7 @@ using Magicord.Core.ApiKeyAuthorization;
 using Magicord.Modules.Trivia;
 using Magicord.Modules.Shop;
 using Magicord.Modules.AdminProcess;
+using Magicord.Modules.Cards;
 
 namespace Magicord
 {
@@ -98,6 +99,7 @@ namespace Magicord
       services.AddScoped<ITriviaGeneratorFactory, TriviaGeneratorFactory>();
       services.AddScoped<IShopService, ShopService>();
       services.AddScoped<IAdminProcessService, AdminProcessService>();
+      services.AddScoped<ICardService, CardService>();
       services.AddSingleton<Random>();
     }
 
