@@ -119,7 +119,9 @@ namespace Magicord.Modules.Booster
         throw new QueryException("Unable to get a random booster within your budget. You broke?");
       }
 
-      return BuyBooster(userId, boosterListing.SetCode);
+      var boosterCards = BuyBooster(userId, boosterListing.SetCode);
+      _dataContext.SaveChanges();
+      return boosterCards;
     }
 
     public List<BoosterPackDto> BuyMultipleBoosters(long userId, string setCode, int count)
@@ -148,6 +150,7 @@ namespace Magicord.Modules.Booster
           return packs;
         }
       }
+      _dataContext.SaveChanges();
       return packs;
     }
 
@@ -200,7 +203,6 @@ namespace Magicord.Modules.Booster
 
       AddBoosterCardsToUser(boosterCards, user);
 
-      _dataContext.SaveChanges();
       return boosterCards;
     }
 

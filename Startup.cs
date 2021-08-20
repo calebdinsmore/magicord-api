@@ -30,6 +30,7 @@ using Magicord.Modules.Trivia;
 using Magicord.Modules.Shop;
 using Magicord.Modules.AdminProcess;
 using Magicord.Modules.Cards;
+using Magicord.Modules.SealedEvents;
 
 namespace Magicord
 {
@@ -68,6 +69,15 @@ namespace Magicord
       services.AddControllers().AddNewtonsoftJson();
       services.AddHttpContextAccessor();
 
+      services.AddErrorFilter(error =>
+      {
+        if (error.Exception is DbUpdateConcurrencyException)
+        {
+          return error.WithCode("ConcurrencyException");
+        }
+        return error;
+      });
+
 
       // Configure settings and DbContext
       IConfigurationSection configurationSection = Configuration.GetSection("ConfigSettings");
@@ -100,6 +110,7 @@ namespace Magicord
       services.AddScoped<IShopService, ShopService>();
       services.AddScoped<IAdminProcessService, AdminProcessService>();
       services.AddScoped<ICardService, CardService>();
+      services.AddScoped<ISealedEventService, SealedEventService>();
       services.AddSingleton<Random>();
     }
 

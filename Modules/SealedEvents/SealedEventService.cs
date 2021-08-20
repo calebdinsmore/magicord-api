@@ -30,6 +30,7 @@ namespace Magicord.Modules.SealedEvents
       var sealedEvent = _dataContext.SealedEvents
         .Include(x => x.SealedEventAttendees)
         .ThenInclude(x => x.User)
+        .ThenInclude(x => x.UserCards)
         .Include(x => x.SealedEventPacks)
         .FirstOrDefault(x => x.Id == sealedEventId);
 

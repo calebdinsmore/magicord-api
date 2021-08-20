@@ -1,4 +1,5 @@
 using System;
+using HotChocolate;
 
 namespace Magicord.Models
 {
@@ -10,6 +11,8 @@ namespace Magicord.Models
     public int Quantity { get; set; }
     public int AmountNonFoil { get; set; }
     public int AmountFoil { get; set; }
+    [GraphQLIgnore]
+    public uint xmin { get; set; }
 
     public virtual User User { get; set; }
     public virtual Card Card { get; set; }

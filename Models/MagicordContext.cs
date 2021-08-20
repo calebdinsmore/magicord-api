@@ -582,9 +582,20 @@ namespace Magicord.Models
       modelBuilder.Entity<SealedEventAttendee>()
         .HasKey(sea => new { sea.UserId, sea.SealedEventId });
 
+      AddConcurrencyTokens(modelBuilder);
+
       OnModelCreatingPartial(modelBuilder);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+    private void AddConcurrencyTokens(ModelBuilder modelBuilder)
+    {
+      modelBuilder.Entity<User>()
+        .UseXminAsConcurrencyToken();
+
+      modelBuilder.Entity<UserCard>()
+        .UseXminAsConcurrencyToken();
+    }
   }
 }
