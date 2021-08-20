@@ -22,7 +22,7 @@ namespace Magicord.Modules.SealedEvents
 
     public IQueryable<SealedEvent> GetActiveSealedEvents()
     {
-      return _dataContext.SealedEvents.Where(x => !x.PacksAreDistributed);
+      return _dataContext.SealedEvents.Where(x => x.IsActive);
     }
 
     public List<UserPacks> DistributeUserPacks(long sealedEventId)
@@ -39,14 +39,13 @@ namespace Magicord.Modules.SealedEvents
         throw new QueryException($"Could not find sealed event with ID {sealedEventId}");
       }
 
-      if (sealedEvent.PacksAreDistributed)
-      {
-        throw new QueryException("The packs in this sealed event have already been distributed.");
-      }
-
       var allUserPacks = new List<UserPacks>();
       foreach (var attendee in sealedEvent.SealedEventAttendees)
       {
+        if (attendee.HasBeenGivenPacks)
+        {
+          continue;
+        }
         foreach (var sealedEventPack in sealedEvent.SealedEventPacks)
         {
           var packs = _boosterService.GenerateMultipleBoosters(sealedEventPack.SetCode, sealedEventPack.PackCount);
@@ -60,8 +59,8 @@ namespace Magicord.Modules.SealedEvents
             _boosterService.AddBoosterCardsToUser(pack.Cards, attendee.User);
           }
         }
+        attendee.HasBeenGivenPacks = true;
       }
-      sealedEvent.PacksAreDistributed = true;
       _dataContext.SaveChanges();
       return allUserPacks;
     }

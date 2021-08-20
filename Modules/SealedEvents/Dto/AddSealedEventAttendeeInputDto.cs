@@ -25,6 +25,11 @@ namespace Magicord.Modules.SealedEvents
         throw new QueryException($"Couldn't find a SealedEvent matching {SealedEventId}");
       }
 
+      if (!sealedEvent.IsActive)
+      {
+        throw new QueryException("This event is no longer accepting attendees.");
+      }
+
       if (sealedEvent.SealedEventAttendees.Any(x => x.UserId == UserId))
       {
         throw new QueryException("You've already registered for this event.");

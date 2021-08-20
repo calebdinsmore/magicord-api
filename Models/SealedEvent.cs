@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Magicord.Models
 {
@@ -8,6 +9,8 @@ namespace Magicord.Models
     public string Name { get; set; }
     public decimal EntryFee { get; set; }
     public bool PacksAreDistributed { get; set; }
+    [DefaultValue(true)]
+    public bool IsActive { get; set; }
 
     public virtual ICollection<SealedEventAttendee> SealedEventAttendees { get; set; }
     public virtual ICollection<SealedEventPack> SealedEventPacks { get; set; }
