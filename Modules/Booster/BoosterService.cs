@@ -119,7 +119,7 @@ namespace Magicord.Modules.Booster
         throw new QueryException("Unable to get a random booster within your budget. You broke?");
       }
 
-      var boosterCards = BuyBooster(userId, boosterListing.SetCode);
+      var boosterCards = ProcessBoosterPurchase(userId, boosterListing.SetCode);
       _dataContext.SaveChanges();
       return boosterCards;
     }
@@ -138,7 +138,7 @@ namespace Magicord.Modules.Booster
         {
           packs.Add(new BoosterPackDto
           {
-            Cards = BuyBooster(userId, setCode)
+            Cards = ProcessBoosterPurchase(userId, setCode)
           });
         }
         catch (QueryException)
@@ -176,35 +176,6 @@ namespace Magicord.Modules.Booster
         }
       }
       return packs;
-    }
-
-    public List<BoosterCardDto> BuyBooster(long userId, string setCode)
-    {
-      setCode = setCode.ToUpper();
-      var boosterListing = _dataContext.StoreBoosterListings.FirstOrDefault(x => x.SetCode == setCode);
-
-      if (boosterListing == null)
-      {
-        throw new QueryException($"Could not find a store booster listing matching set {setCode}");
-      }
-      var boosterCards = GenerateBooster(setCode);
-      var user = _dataContext.Users.Include(x => x.UserCards).FirstOrDefault(x => x.Id == userId);
-
-      if (user == null)
-      {
-        throw new QueryException($"User does not exist. Try `mc start`.");
-      }
-
-      if (user.Balance - boosterListing.RetailPrice < 0)
-      {
-        throw new QueryException($"Insufficient funds to purchase booster.");
-      }
-
-      user.Balance -= boosterListing.RetailPrice;
-
-      AddBoosterCardsToUser(boosterCards, user);
-
-      return boosterCards;
     }
 
     public void AddBoosterCardsToUser(List<BoosterCardDto> boosterCards, User user)
@@ -310,6 +281,42 @@ namespace Magicord.Modules.Booster
       _dataContext.Add(entity);
       _dataContext.SaveChanges();
       return entity;
+    }
+
+    public List<BoosterCardDto> BuySingleBooster(long userId, string setCode)
+    {
+      var cards = ProcessBoosterPurchase(userId, setCode);
+      _dataContext.SaveChanges();
+      return cards;
+    }
+
+    private List<BoosterCardDto> ProcessBoosterPurchase(long userId, string setCode)
+    {
+      setCode = setCode.ToUpper();
+      var boosterListing = _dataContext.StoreBoosterListings.FirstOrDefault(x => x.SetCode == setCode);
+
+      if (boosterListing == null)
+      {
+        throw new QueryException($"Could not find a store booster listing matching set {setCode}");
+      }
+      var boosterCards = GenerateBooster(setCode);
+      var user = _dataContext.Users.Include(x => x.UserCards).FirstOrDefault(x => x.Id == userId);
+
+      if (user == null)
+      {
+        throw new QueryException($"User does not exist. Try `mc start`.");
+      }
+
+      if (user.Balance - boosterListing.RetailPrice < 0)
+      {
+        throw new QueryException($"Insufficient funds to purchase booster.");
+      }
+
+      user.Balance -= boosterListing.RetailPrice;
+
+      AddBoosterCardsToUser(boosterCards, user);
+
+      return boosterCards;
     }
   }
 }

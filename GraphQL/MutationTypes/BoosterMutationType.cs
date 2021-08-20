@@ -10,7 +10,7 @@ namespace Magicord.GraphQL.MutationTypes
   {
     public List<BoosterCardDto> BuyBooster([Service] IBoosterService boosterService, long userId, string setCode)
     {
-      return boosterService.BuyBooster(userId, setCode);
+      return boosterService.BuySingleBooster(userId, setCode);
     }
 
     public List<BoosterCardDto> BuyRandomBooster([Service] IBoosterService boosterService, long userId)
