@@ -147,6 +147,7 @@ namespace Magicord.Modules.Booster
           {
             throw;
           }
+          _dataContext.SaveChanges();
           return packs;
         }
       }
