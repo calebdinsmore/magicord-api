@@ -180,6 +180,7 @@ namespace Magicord.Modules.Booster
 
     public List<BoosterCardDto> BuyBooster(long userId, string setCode)
     {
+      setCode = setCode.ToUpper();
       var boosterListing = _dataContext.StoreBoosterListings.FirstOrDefault(x => x.SetCode == setCode);
 
       if (boosterListing == null)
