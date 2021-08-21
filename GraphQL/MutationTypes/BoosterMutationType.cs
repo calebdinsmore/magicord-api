@@ -27,5 +27,10 @@ namespace Magicord.GraphQL.MutationTypes
     {
       return boosterService.AddBoosterListing(setCode, retailPrice);
     }
+
+    public List<BoosterPackDto> GiveBoostersToUser([Service] IBoosterService boosterService, long userId, string setCode, int count)
+    {
+      return boosterService.GiveBoostersToUser(userId, setCode, count);
+    }
   }
 }

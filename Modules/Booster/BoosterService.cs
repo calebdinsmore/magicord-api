@@ -291,6 +291,19 @@ namespace Magicord.Modules.Booster
       return cards;
     }
 
+    public List<BoosterPackDto> GiveBoostersToUser(long userId, string setCode, int count)
+    {
+      var user = _dataContext.Users.Include(x => x.UserCards).FirstOrDefault(x => x.Id == userId);
+      var boosterPacks = GenerateMultipleBoosters(setCode, count);
+
+      foreach (var pack in boosterPacks)
+      {
+        AddBoosterCardsToUser(pack.Cards, user);
+      }
+      _dataContext.SaveChanges();
+      return boosterPacks;
+    }
+
     private List<BoosterCardDto> ProcessBoosterPurchase(long userId, string setCode)
     {
       setCode = setCode.ToUpper();

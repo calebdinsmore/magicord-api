@@ -9,6 +9,7 @@ namespace Magicord.Modules.Booster
     List<BoosterCardDto> BuyRandomBooster(long userId);
     List<BoosterPackDto> BuyMultipleBoosters(long userId, string setCode, int count);
     List<BoosterCardDto> BuySingleBooster(long userId, string setCode);
+    List<BoosterPackDto> GiveBoostersToUser(long userId, string setCode, int count);
     void AddBoosterCardsToUser(List<BoosterCardDto> boosterCards, User user);
     List<BoosterCardDto> GenerateBooster(string setCode);
     List<BoosterPackDto> GenerateMultipleBoosters(string setCode, int count);
