@@ -33,5 +33,10 @@ namespace Magicord.GraphQL.QueryTypes
     {
       return userService.GetUserStats(id);
     }
+
+    public List<UserCollectionValueChangeDto> GetChangeInUserCollectionValues([Service] IUserService service)
+    {
+      return service.GetChangeInUserCollectionValues();
+    }
   }
 }

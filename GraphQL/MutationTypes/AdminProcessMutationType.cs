@@ -13,5 +13,11 @@ namespace Magicord.GraphQL.MutationTypes
       await service.PullDownMtgJsonData();
       return true;
     }
+
+    public async Task<bool> UpdateCardPrices([Service] IAdminProcessService service)
+    {
+      await service.UpdateCardPrices();
+      return true;
+    }
   }
 }

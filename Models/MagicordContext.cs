@@ -40,6 +40,7 @@ namespace Magicord.Models
     public virtual DbSet<UserBooster> UserBoosters { get; set; }
     public virtual DbSet<StoreBoosterListing> StoreBoosterListings { get; set; }
     public virtual DbSet<SealedEvent> SealedEvents { get; set; }
+    public virtual DbSet<CardPriceHistory> CardPriceHistories { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -538,6 +539,16 @@ namespace Magicord.Models
           .HasOne(uc => uc.User)
           .WithMany(u => u.UserCards)
           .HasForeignKey(uc => uc.UserId);
+
+      modelBuilder.Entity<CardPriceHistory>()
+        .HasOne(cph => cph.Card)
+        .WithMany(c => c.CardPriceHistories)
+        .HasPrincipalKey(c => c.Uuid)
+        .HasForeignKey(cph => cph.CardUuid);
+
+      modelBuilder.Entity<CardPriceHistory>()
+        .HasOne(cph => cph.CardPrice)
+        .WithMany(cp => cp.CardPriceHistories);
 
       modelBuilder.Entity<UserBooster>()
         .HasOne(ub => ub.User)

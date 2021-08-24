@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Magicord.Models;
 
@@ -16,5 +17,7 @@ namespace Magicord.Modules.Users
     IQueryable<UserCard> GetUserCardsById(long id);
 
     UserStatsDto GetUserStats(long id);
+
+    List<UserCollectionValueChangeDto> GetChangeInUserCollectionValues();
   }
 }

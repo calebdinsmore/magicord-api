@@ -22,5 +22,6 @@ namespace Magicord.Models
     public Dictionary<DateTime, decimal> RetailNonFoilHistory { get; set; }
 
     public virtual Card Card { get; set; }
+    public virtual ICollection<CardPriceHistory> CardPriceHistories { get; set; }
   }
 }

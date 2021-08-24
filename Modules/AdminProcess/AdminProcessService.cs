@@ -30,6 +30,7 @@ namespace Magicord.Modules.AdminProcess
         // var sets = GetNewSets(allPrintings);
         // PersistSets(sets);
         var allPrices = await GetAllPricesJson();
+        ArchiveCurrentPrices();
         PersistCardPrices(allPrices);
         CreateBlankCardPrices();
       }
@@ -37,6 +38,37 @@ namespace Magicord.Modules.AdminProcess
       {
 
         throw;
+      }
+    }
+
+    public async Task UpdateCardPrices()
+    {
+      var allPrices = await GetAllPricesJson();
+      ArchiveCurrentPrices();
+      PersistCardPrices(allPrices);
+      CreateBlankCardPrices();
+      _dataContext.SaveChanges();
+    }
+
+    private void ArchiveCurrentPrices()
+    {
+      var threeDaysAgo = DateTime.Now.Subtract(TimeSpan.FromDays(3));
+      var cardPrices = _dataContext.CardPrices
+        .Include(x => x.CardPriceHistories)
+        .Where(x => !x.CardPriceHistories.Any(cph => cph.DateRecorded > threeDaysAgo));
+
+      foreach (var cardPrice in cardPrices)
+      {
+        _dataContext.Add(new CardPriceHistory
+        {
+          CardUuid = cardPrice.CardUuid,
+          BuylistFoil = cardPrice.CurrentBuylistFoil,
+          BuylistNonFoil = cardPrice.CurrentBuylistNonFoil,
+          RetailFoil = cardPrice.CurrentRetailFoil,
+          RetailNonFoil = cardPrice.CurrentRetailNonFoil,
+          DateRecorded = DateTime.Now,
+          CardPriceId = cardPrice.Id
+        });
       }
     }
 
@@ -54,10 +86,9 @@ namespace Magicord.Modules.AdminProcess
           CurrentRetailNonFoil = 0
         });
       }
-      _dataContext.SaveChanges();
     }
 
-    private int PersistCardPrices(AllPricesJson allPricesJson)
+    private void PersistCardPrices(AllPricesJson allPricesJson)
     {
       var cardUuidDict = new Dictionary<string, bool>();
       foreach (var uuid in _dataContext.Cards.Select(x => x.Uuid).ToList())
@@ -98,7 +129,6 @@ namespace Magicord.Modules.AdminProcess
           _dataContext.Add(newCardPrice);
         }
       }
-      return _dataContext.SaveChanges();
     }
 
     private void PersistSets(IEnumerable<Set> newSets)

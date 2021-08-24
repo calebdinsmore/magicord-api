@@ -103,6 +103,24 @@ namespace Magicord.Modules.Users
       };
     }
 
+    public List<UserCollectionValueChangeDto> GetChangeInUserCollectionValues()
+    {
+      var collectionList = new List<UserCollectionValueChangeDto>();
+      var users = _dataContext.Users
+        .Include(x => x.UserCards).ThenInclude(x => x.Card).ThenInclude(x => x.CardPrice)
+        .Include(x => x.UserCards).ThenInclude(x => x.Card).ThenInclude(x => x.CardPriceHistories.OrderByDescending(cph => cph.DateRecorded).Take(1));
+      foreach (var user in users)
+      {
+        collectionList.Add(new UserCollectionValueChangeDto
+        {
+          UserId = user.Id,
+          NewCollectionValue = user.UserCards.Sum(x => (x.Card.CardPrice.CurrentBuylistNonFoil * x.AmountNonFoil) + (x.Card.CardPrice.CurrentBuylistFoil * x.AmountFoil)),
+          OldCollectionValue = user.UserCards.Sum(x => (x.Card.CardPriceHistories.First().BuylistNonFoil * x.AmountNonFoil) + (x.Card.CardPriceHistories.First().BuylistFoil * x.AmountFoil))
+        });
+      }
+      return collectionList;
+    }
+
     public IQueryable<UserCard> GetUserCardsById(long id)
     {
       return _dataContext.Users
