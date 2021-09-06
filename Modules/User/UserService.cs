@@ -129,5 +129,10 @@ namespace Magicord.Modules.Users
         .FirstOrDefault(x => x.Id == id)
         ?.UserCards.AsQueryable();
     }
+
+    public void ValidateTrade(TradeDto dto)
+    {
+
+    }
   }
 }
