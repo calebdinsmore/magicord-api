@@ -95,6 +95,7 @@ namespace Magicord.Modules.AdminProcess
       {
         cardUuidDict.Add(uuid, true);
       }
+      var existingCardPrices = _dataContext.CardPrices.ToDictionary(x => x.CardUuid);
       foreach (var cardUuid in allPricesJson.Data.Keys)
       {
         if (!cardUuidDict.ContainsKey(cardUuid))
@@ -108,7 +109,7 @@ namespace Magicord.Modules.AdminProcess
         var buylistNonFoil = buylist?.Normal?.OrderByDescending(x => x.Key)?.FirstOrDefault().Value ?? 0;
         var retailFoil = retail?.Foil?.OrderByDescending(x => x.Key)?.FirstOrDefault().Value ?? 0;
         var retailNonFoil = retail?.Normal?.OrderByDescending(x => x.Key)?.FirstOrDefault().Value ?? 0;
-        var existing = _dataContext.CardPrices.FirstOrDefault(x => x.CardUuid == cardUuid);
+        var existing = existingCardPrices.GetValueOrDefault(cardUuid);
         if (existing != null)
         {
           existing.CurrentBuylistFoil = buylistFoil;
