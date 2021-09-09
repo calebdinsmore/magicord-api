@@ -9,7 +9,7 @@ namespace Magicord.Models
       get
       {
         var shareValue = IsFoil ? Card?.CardPrice?.CurrentRetailFoil ?? 0 : Card?.CardPrice?.CurrentRetailNonFoil ?? 0;
-        return shareValue * Amount;
+        return shareValue;
       }
     }
 
@@ -17,11 +17,19 @@ namespace Magicord.Models
     {
       get
       {
-        if (CashInvested <= 0)
+        if (AverageInvestedValue == 0)
         {
           return 0;
         }
-        return (CurrentValue - CashInvested) / CashInvested;
+        return (CurrentValue - AverageInvestedValue) / AverageInvestedValue;
+      }
+    }
+
+    public decimal GainOrLoss
+    {
+      get
+      {
+        return (CurrentValue * Amount) - (AverageInvestedValue * Amount);
       }
     }
 
@@ -30,6 +38,7 @@ namespace Magicord.Models
     public long UserId { get; set; }
     public decimal Amount { get; set; }
     public decimal CashInvested { get; set; }
+    public decimal AverageInvestedValue { get; set; }
     public bool IsFoil { get; set; }
     [GraphQLIgnore]
     public uint xmin { get; set; }

@@ -30,6 +30,10 @@ namespace Magicord.Modules.Users
 
     StockTransactionResultDto ShortShares(StockTransactionInputDto input);
 
-    StockTransactionResultDto AddToShortCashReserve(long userId, long shortId, decimal dollarAmount);
+    StockTransactionResultDto AddToShortCashReserve(ShortAdjustmentInputDto input);
+
+    StockTransactionResultDto ReduceShortPosition(ShortAdjustmentInputDto input);
+
+    StockTransactionResultDto CloseShortPosition(ShortAdjustmentInputDto input);
   }
 }

@@ -31,5 +31,20 @@ namespace Magicord.GraphQL.MutationTypes
     {
       return userService.ShortShares(input);
     }
+
+    public StockTransactionResultDto ReduceShort([Service] IUserService userService, ShortAdjustmentInputDto input)
+    {
+      return userService.ReduceShortPosition(input);
+    }
+
+    public StockTransactionResultDto BolsterShort([Service] IUserService userService, ShortAdjustmentInputDto input)
+    {
+      return userService.AddToShortCashReserve(input);
+    }
+
+    public StockTransactionResultDto CloseShort([Service] IUserService userService, ShortAdjustmentInputDto input)
+    {
+      return userService.CloseShortPosition(input);
+    }
   }
 }

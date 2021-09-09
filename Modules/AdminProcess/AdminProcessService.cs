@@ -52,10 +52,8 @@ namespace Magicord.Modules.AdminProcess
 
     private void ArchiveCurrentPrices()
     {
-      var threeDaysAgo = DateTime.Now.Subtract(TimeSpan.FromDays(3));
       var cardPrices = _dataContext.CardPrices
-        .Include(x => x.CardPriceHistories)
-        .Where(x => !x.CardPriceHistories.Any(cph => cph.DateRecorded > threeDaysAgo));
+        .Include(x => x.CardPriceHistories);
 
       foreach (var cardPrice in cardPrices)
       {
@@ -70,6 +68,10 @@ namespace Magicord.Modules.AdminProcess
           CardPriceId = cardPrice.Id
         });
       }
+
+      var thirtyDaysAgo = DateTime.Now.Subtract(TimeSpan.FromDays(30));
+      var oldCardPrices = _dataContext.CardPriceHistories.Where(x => x.DateRecorded < thirtyDaysAgo);
+      _dataContext.RemoveRange(oldCardPrices);
     }
 
     private void CreateBlankCardPrices()

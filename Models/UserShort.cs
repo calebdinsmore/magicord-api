@@ -8,7 +8,7 @@ namespace Magicord.Models
     {
       get
       {
-        return BuybackCost > ReservedCash;
+        return (BuybackCost * Amount) > ReservedCash;
       }
     }
 
@@ -16,7 +16,7 @@ namespace Magicord.Models
     {
       get
       {
-        return IsFoil ? (Card?.CardPrice?.CurrentRetailFoil ?? 0) : (Card?.CardPrice?.CurrentRetailNonFoil ?? 0) * Amount;
+        return IsFoil ? (Card?.CardPrice?.CurrentRetailFoil ?? 0) : (Card?.CardPrice?.CurrentRetailNonFoil ?? 0);
       }
     }
 
@@ -24,7 +24,7 @@ namespace Magicord.Models
     {
       get
       {
-        return (ReservedCash / 2) - BuybackCost;
+        return (ShortedValue - BuybackCost) * Amount;
       }
     }
 
@@ -34,6 +34,7 @@ namespace Magicord.Models
     public decimal Amount { get; set; }
     public decimal ReservedCash { get; set; }
     public bool IsFoil { get; set; }
+    public decimal ShortedValue { get; set; }
     [GraphQLIgnore]
     public uint xmin { get; set; }
 

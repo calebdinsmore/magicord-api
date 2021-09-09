@@ -160,13 +160,15 @@ namespace Magicord.Modules.Users
           UserId = input.UserId,
           Amount = shareAmount,
           CashInvested = orderValue,
-          IsFoil = input.IsFoil
+          IsFoil = input.IsFoil,
+          AverageInvestedValue = cardShareValue
         };
         _dataContext.Add(existingShares);
       }
       else
       {
         existingShares.CashInvested += orderValue;
+        existingShares.AverageInvestedValue = ((cardShareValue * shareAmount) + (existingShares.AverageInvestedValue * existingShares.Amount)) / (existingShares.Amount + shareAmount);
         existingShares.Amount += shareAmount;
       }
       _dataContext.SaveChanges();
@@ -243,13 +245,15 @@ namespace Magicord.Modules.Users
           UserId = input.UserId,
           Amount = shareAmount,
           ReservedCash = orderValue * 2,
-          IsFoil = input.IsFoil
+          IsFoil = input.IsFoil,
+          ShortedValue = cardShareValue
         };
         _dataContext.Add(existingShorts);
       }
       else
       {
         existingShorts.ReservedCash += orderValue * 2;
+        existingShorts.ShortedValue = ((cardShareValue * shareAmount) + (existingShorts.ShortedValue * existingShorts.Amount)) / (existingShorts.Amount + shareAmount);
         existingShorts.Amount += shareAmount;
       }
       _dataContext.SaveChanges();
@@ -260,10 +264,12 @@ namespace Magicord.Modules.Users
       };
     }
 
-    public StockTransactionResultDto AddToShortCashReserve(long userId, long shortId, decimal dollarAmount)
+    public StockTransactionResultDto AddToShortCashReserve(ShortAdjustmentInputDto input)
     {
-      var userShort = _dataContext.UserShorts.Find(shortId);
-      var user = _dataContext.Users.Find(userId);
+      input.Validate(_dataContext);
+      var dollarAmount = input.DollarAmount ?? 0;
+      var userShort = _dataContext.UserShorts.FirstOrDefault(x => x.CardId == input.CardId && x.IsFoil == input.IsFoil && x.UserId == input.UserId);
+      var user = _dataContext.Users.Find(input.UserId);
       if (userShort == null)
       {
         throw new QueryException("Unable to find a short position with that ID.");
@@ -272,11 +278,7 @@ namespace Magicord.Modules.Users
       {
         throw new QueryException("Unable to find a user with that ID. Try `mc start`?");
       }
-      if (dollarAmount <= 0)
-      {
-        throw new QueryException("Dollar amount must be greater than 0.");
-      }
-      if (dollarAmount > user.Balance)
+      if ((input.DollarAmount ?? 0) > user.Balance)
       {
         throw new QueryException("Insufficient funds to add specified amount to short position reserves.");
       }
@@ -287,6 +289,69 @@ namespace Magicord.Modules.Users
       {
         DollarAmount = dollarAmount,
         CurrentShort = userShort
+      };
+    }
+
+    public StockTransactionResultDto ReduceShortPosition(ShortAdjustmentInputDto input)
+    {
+      input.Validate(_dataContext);
+      var user = _dataContext.Users.FirstOrDefault(x => x.Id == input.UserId);
+      var userShort = _dataContext.UserShorts.FirstOrDefault(x => x.CardId == input.CardId && x.IsFoil == input.IsFoil && x.UserId == input.UserId);
+      if (userShort.IsRed)
+      {
+        throw new QueryException("You can't reduce a short position that's in the red. Either close the position with `mc stocks close_short` or add to its reserves with `mc stocks bolster_short`.");
+      }
+      var card = _dataContext.Cards.Include(x => x.CardPrice).FirstOrDefault(x => x.Id == input.CardId);
+      var cardShareValue = input.IsFoil ? card.CardPrice.CurrentRetailFoil : card.CardPrice.CurrentRetailNonFoil;
+      var orderValue = input.DollarAmount ?? 0;
+      if (orderValue == 0)
+      {
+        orderValue = (input.ShareAmount ?? 0) * cardShareValue;
+      }
+      var shareAmount = input.ShareAmount ?? 0;
+      if (shareAmount == 0)
+      {
+        shareAmount = (input.DollarAmount ?? 0) / cardShareValue;
+      }
+
+      userShort.ReservedCash -= orderValue * 2;
+      user.Balance += orderValue;
+      userShort.Amount -= shareAmount;
+      if (userShort.Amount == 0)
+      {
+        _dataContext.Remove(userShort);
+        if (userShort.ReservedCash > 0)
+        {
+          orderValue += userShort.ReservedCash;
+          user.Balance += userShort.ReservedCash;
+        }
+      }
+      _dataContext.SaveChanges();
+      return new StockTransactionResultDto
+      {
+        DollarAmount = orderValue,
+        CurrentShort = userShort
+      };
+    }
+
+    public StockTransactionResultDto CloseShortPosition(ShortAdjustmentInputDto input)
+    {
+      var userShort = _dataContext.UserShorts.FirstOrDefault(x => x.CardId == input.CardId && x.IsFoil == input.IsFoil && x.UserId == input.UserId);
+      if (userShort == null)
+      {
+        input.Validate(_dataContext);
+      }
+      if (!userShort.IsRed)
+      {
+        input.ShareAmount = userShort.Amount;
+        return ReduceShortPosition(input);
+      }
+      _dataContext.Remove(userShort);
+      _dataContext.SaveChanges();
+      return new StockTransactionResultDto
+      {
+        DollarAmount = 0,
+        CurrentShort = null
       };
     }
 

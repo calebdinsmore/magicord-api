@@ -5,15 +5,17 @@ using Magicord.Models;
 using Magicord.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Magicord.Migrations
 {
     [DbContext(typeof(MagicordContext))]
-    partial class magicordContextModelSnapshot : ModelSnapshot
+    [Migration("20210909150323_AddShortedValueColumn")]
+    partial class AddShortedValueColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1132,10 +1134,6 @@ namespace Magicord.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric")
                         .HasColumnName("amount");
-
-                    b.Property<decimal>("AverageInvestedValue")
-                        .HasColumnType("numeric")
-                        .HasColumnName("average_invested_value");
 
                     b.Property<long>("CardId")
                         .HasColumnType("bigint")
