@@ -5,15 +5,17 @@ using Magicord.Models;
 using Magicord.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Magicord.Migrations
 {
     [DbContext(typeof(MagicordContext))]
-    partial class magicordContextModelSnapshot : ModelSnapshot
+    [Migration("20210908181918_AddStockMarket")]
+    partial class AddStockMarket
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1149,10 +1151,8 @@ namespace Magicord.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("user_id");
 
-                    b.Property<uint>("xmin")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
+                    b.Property<long>("xmin")
+                        .HasColumnType("bigint")
                         .HasColumnName("xmin");
 
                     b.HasKey("Id")
@@ -1195,10 +1195,8 @@ namespace Magicord.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("user_id");
 
-                    b.Property<uint>("xmin")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
+                    b.Property<long>("xmin")
+                        .HasColumnType("bigint")
                         .HasColumnName("xmin");
 
                     b.HasKey("Id")

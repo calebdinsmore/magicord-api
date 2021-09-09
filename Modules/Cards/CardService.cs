@@ -25,7 +25,10 @@ namespace Magicord.Modules.Cards
         throw new QueryException("'Name' argument required.");
       }
 
-      var exactMatch = _dataContext.Cards.Where(x => x.Name.ToLower() == input.Name.ToLower());
+      var exactMatch = _dataContext.Cards
+        .Include(x => x.CardPrice)
+        .ThenInclude(x => x.CardPriceHistories.OrderByDescending(y => y.DateRecorded).Take(1))
+        .Where(x => x.Name.ToLower() == input.Name.ToLower());
       if (!string.IsNullOrEmpty(input.SetCode))
       {
         exactMatch = exactMatch.Where(x => x.SetCode == input.SetCode);

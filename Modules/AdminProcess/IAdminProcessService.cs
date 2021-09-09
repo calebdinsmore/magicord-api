@@ -5,6 +5,6 @@ namespace Magicord.Modules.AdminProcess
   public interface IAdminProcessService
   {
     Task PullDownMtgJsonData();
-    Task UpdateCardPrices();
+    Task UpdateCardPrices(string dummyArg);
   }
 }

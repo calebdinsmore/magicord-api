@@ -16,5 +16,20 @@ namespace Magicord.GraphQL.MutationTypes
     {
       return userService.AddToUserBalance(input);
     }
+
+    public StockTransactionResultDto BuyShares([Service] IUserService userService, StockTransactionInputDto input)
+    {
+      return userService.BuyShares(input);
+    }
+
+    public StockTransactionResultDto SellShares([Service] IUserService userService, StockTransactionInputDto input)
+    {
+      return userService.SellShares(input);
+    }
+
+    public StockTransactionResultDto ShortShares([Service] IUserService userService, StockTransactionInputDto input)
+    {
+      return userService.ShortShares(input);
+    }
   }
 }

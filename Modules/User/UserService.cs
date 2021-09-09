@@ -98,7 +98,9 @@ namespace Magicord.Modules.Users
       return new UserStatsDto
       {
         Balance = user.Balance,
-        NetWorth = user.Balance + user.UserCards.Sum(x => (x.Card.CardPrice.CurrentBuylistNonFoil * x.AmountNonFoil) + (x.Card.CardPrice.CurrentBuylistFoil * x.AmountFoil)),
+        NetWorth =
+          user.Balance +
+          user.UserCards.Sum(x => (x.Card.CardPrice.CurrentBuylistNonFoil * x.AmountNonFoil) + (x.Card.CardPrice.CurrentBuylistFoil * x.AmountFoil)),
         NumberOfCardsOwned = user.UserCards.Sum(x => x.AmountFoil + x.AmountNonFoil)
       };
     }
@@ -128,6 +130,174 @@ namespace Magicord.Modules.Users
         .ThenInclude(x => x.Card)
         .FirstOrDefault(x => x.Id == id)
         ?.UserCards.AsQueryable();
+    }
+
+    public StockTransactionResultDto BuyShares(StockTransactionInputDto input)
+    {
+      input.OrderType = OrderTypeEnum.Buy;
+      input.Validate(_dataContext);
+      var existingShares = _dataContext.UserShares.FirstOrDefault(x => x.UserId == input.UserId && x.CardId == input.CardId && x.IsFoil == input.IsFoil);
+      var user = _dataContext.Users.FirstOrDefault(x => x.Id == input.UserId);
+      var card = _dataContext.Cards.Include(x => x.CardPrice).FirstOrDefault(x => x.Id == input.CardId);
+      var cardShareValue = input.IsFoil ? card.CardPrice.CurrentRetailFoil : card.CardPrice.CurrentRetailNonFoil;
+      var orderValue = input.DollarAmount ?? 0;
+      if (orderValue == 0)
+      {
+        orderValue = (input.ShareAmount ?? 0) * cardShareValue;
+      }
+      var shareAmount = input.ShareAmount ?? 0;
+      if (shareAmount == 0)
+      {
+        shareAmount = (input.DollarAmount ?? 0) / cardShareValue;
+      }
+
+      user.Balance -= orderValue;
+      if (existingShares == null)
+      {
+        existingShares = new UserShare
+        {
+          CardId = input.CardId,
+          UserId = input.UserId,
+          Amount = shareAmount,
+          CashInvested = orderValue,
+          IsFoil = input.IsFoil
+        };
+        _dataContext.Add(existingShares);
+      }
+      else
+      {
+        existingShares.CashInvested += orderValue;
+        existingShares.Amount += shareAmount;
+      }
+      _dataContext.SaveChanges();
+      return new StockTransactionResultDto
+      {
+        DollarAmount = orderValue,
+        CurrentShare = existingShares
+      };
+    }
+
+    public StockTransactionResultDto SellShares(StockTransactionInputDto input)
+    {
+      input.OrderType = OrderTypeEnum.Sell;
+      input.Validate(_dataContext);
+      var existingShares = _dataContext.UserShares.FirstOrDefault(x => x.UserId == input.UserId && x.CardId == input.CardId && x.IsFoil == input.IsFoil);
+      var user = _dataContext.Users.FirstOrDefault(x => x.Id == input.UserId);
+      var card = _dataContext.Cards.Include(x => x.CardPrice).FirstOrDefault(x => x.Id == input.CardId);
+      var cardShareValue = input.IsFoil ? card.CardPrice.CurrentRetailFoil : card.CardPrice.CurrentRetailNonFoil;
+      var orderValue = input.DollarAmount ?? 0;
+      if (orderValue == 0)
+      {
+        orderValue = (input.ShareAmount ?? 0) * cardShareValue;
+      }
+      var shareAmount = input.ShareAmount ?? 0;
+      if (shareAmount == 0)
+      {
+        shareAmount = (input.DollarAmount ?? 0) / cardShareValue;
+      }
+
+      user.Balance += orderValue;
+      existingShares.Amount -= shareAmount;
+      existingShares.CashInvested -= orderValue;
+      if (existingShares.CashInvested < 0)
+      {
+        existingShares.CashInvested = 0;
+      }
+      if (existingShares.Amount == 0)
+      {
+        _dataContext.Remove(existingShares);
+      }
+      _dataContext.SaveChanges();
+      return new StockTransactionResultDto
+      {
+        DollarAmount = orderValue,
+        CurrentShare = existingShares
+      };
+    }
+
+    public StockTransactionResultDto ShortShares(StockTransactionInputDto input)
+    {
+      input.OrderType = OrderTypeEnum.Short;
+      input.Validate(_dataContext);
+      var existingShorts = _dataContext.UserShorts.FirstOrDefault(x => x.UserId == input.UserId && x.CardId == input.CardId && x.IsFoil == input.IsFoil);
+      var user = _dataContext.Users.FirstOrDefault(x => x.Id == input.UserId);
+      var card = _dataContext.Cards.Include(x => x.CardPrice).FirstOrDefault(x => x.Id == input.CardId);
+      var cardShareValue = input.IsFoil ? card.CardPrice.CurrentRetailFoil : card.CardPrice.CurrentRetailNonFoil;
+      var orderValue = input.DollarAmount ?? 0;
+      if (orderValue == 0)
+      {
+        orderValue = (input.ShareAmount ?? 0) * cardShareValue;
+      }
+      var shareAmount = input.ShareAmount ?? 0;
+      if (shareAmount == 0)
+      {
+        shareAmount = (input.DollarAmount ?? 0) / cardShareValue;
+      }
+
+      user.Balance -= orderValue;
+      if (existingShorts == null)
+      {
+        existingShorts = new UserShort
+        {
+          CardId = input.CardId,
+          UserId = input.UserId,
+          Amount = shareAmount,
+          ReservedCash = orderValue * 2,
+          IsFoil = input.IsFoil
+        };
+        _dataContext.Add(existingShorts);
+      }
+      else
+      {
+        existingShorts.ReservedCash += orderValue * 2;
+        existingShorts.Amount += shareAmount;
+      }
+      _dataContext.SaveChanges();
+      return new StockTransactionResultDto
+      {
+        DollarAmount = orderValue,
+        CurrentShort = existingShorts
+      };
+    }
+
+    public StockTransactionResultDto AddToShortCashReserve(long userId, long shortId, decimal dollarAmount)
+    {
+      var userShort = _dataContext.UserShorts.Find(shortId);
+      var user = _dataContext.Users.Find(userId);
+      if (userShort == null)
+      {
+        throw new QueryException("Unable to find a short position with that ID.");
+      }
+      if (user == null)
+      {
+        throw new QueryException("Unable to find a user with that ID. Try `mc start`?");
+      }
+      if (dollarAmount <= 0)
+      {
+        throw new QueryException("Dollar amount must be greater than 0.");
+      }
+      if (dollarAmount > user.Balance)
+      {
+        throw new QueryException("Insufficient funds to add specified amount to short position reserves.");
+      }
+      user.Balance -= dollarAmount;
+      userShort.ReservedCash += dollarAmount;
+      _dataContext.SaveChanges();
+      return new StockTransactionResultDto
+      {
+        DollarAmount = dollarAmount,
+        CurrentShort = userShort
+      };
+    }
+
+    public IQueryable<UserShare> GetUserSharesById(long id)
+    {
+      return _dataContext.UserShares.Where(x => x.UserId == id);
+    }
+
+    public IQueryable<UserShort> GetUserShortsById(long id)
+    {
+      return _dataContext.UserShorts.Where(x => x.UserId == id);
     }
   }
 }

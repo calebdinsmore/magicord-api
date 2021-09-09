@@ -16,6 +16,7 @@ namespace Magicord.Modules.AdminProcess
   public class PaperRetailerJson
   {
     public RetailerPriceListJson CardKingdom { get; set; }
+    public RetailerPriceListJson TcgPlayer { get; set; }
   }
 
   public class RetailerPriceListJson

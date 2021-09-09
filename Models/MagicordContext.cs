@@ -41,6 +41,8 @@ namespace Magicord.Models
     public virtual DbSet<StoreBoosterListing> StoreBoosterListings { get; set; }
     public virtual DbSet<SealedEvent> SealedEvents { get; set; }
     public virtual DbSet<CardPriceHistory> CardPriceHistories { get; set; }
+    public virtual DbSet<UserShare> UserShares { get; set; }
+    public virtual DbSet<UserShort> UserShorts { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -606,6 +608,12 @@ namespace Magicord.Models
         .UseXminAsConcurrencyToken();
 
       modelBuilder.Entity<UserCard>()
+        .UseXminAsConcurrencyToken();
+
+      modelBuilder.Entity<UserShare>()
+        .UseXminAsConcurrencyToken();
+
+      modelBuilder.Entity<UserShort>()
         .UseXminAsConcurrencyToken();
     }
   }

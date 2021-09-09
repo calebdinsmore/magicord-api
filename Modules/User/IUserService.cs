@@ -16,8 +16,20 @@ namespace Magicord.Modules.Users
 
     IQueryable<UserCard> GetUserCardsById(long id);
 
+    IQueryable<UserShare> GetUserSharesById(long id);
+
+    IQueryable<UserShort> GetUserShortsById(long id);
+
     UserStatsDto GetUserStats(long id);
 
     List<UserCollectionValueChangeDto> GetChangeInUserCollectionValues();
+
+    StockTransactionResultDto BuyShares(StockTransactionInputDto input);
+
+    StockTransactionResultDto SellShares(StockTransactionInputDto input);
+
+    StockTransactionResultDto ShortShares(StockTransactionInputDto input);
+
+    StockTransactionResultDto AddToShortCashReserve(long userId, long shortId, decimal dollarAmount);
   }
 }

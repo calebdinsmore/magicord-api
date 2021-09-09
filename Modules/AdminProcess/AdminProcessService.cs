@@ -41,7 +41,7 @@ namespace Magicord.Modules.AdminProcess
       }
     }
 
-    public async Task UpdateCardPrices()
+    public async Task UpdateCardPrices(string dummyArg)
     {
       var allPrices = await GetAllPricesJson();
       ArchiveCurrentPrices();
@@ -104,7 +104,7 @@ namespace Magicord.Modules.AdminProcess
         }
         var priceData = allPricesJson.Data.GetValueOrDefault(cardUuid);
         var buylist = priceData.Paper?.CardKingdom?.Buylist;
-        var retail = priceData.Paper?.CardKingdom?.Retail;
+        var retail = priceData.Paper?.TcgPlayer?.Retail;
         var buylistFoil = buylist?.Foil?.OrderByDescending(x => x.Key)?.FirstOrDefault().Value ?? 0;
         var buylistNonFoil = buylist?.Normal?.OrderByDescending(x => x.Key)?.FirstOrDefault().Value ?? 0;
         var retailFoil = retail?.Foil?.OrderByDescending(x => x.Key)?.FirstOrDefault().Value ?? 0;

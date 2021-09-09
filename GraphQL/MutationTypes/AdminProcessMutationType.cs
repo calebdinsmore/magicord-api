@@ -14,9 +14,9 @@ namespace Magicord.GraphQL.MutationTypes
       return true;
     }
 
-    public async Task<bool> UpdateCardPrices([Service] IAdminProcessService service)
+    public async Task<bool> UpdateCardPrices([Service] IAdminProcessService service, string dummyArg)
     {
-      await service.UpdateCardPrices();
+      await service.UpdateCardPrices(dummyArg);
       return true;
     }
   }

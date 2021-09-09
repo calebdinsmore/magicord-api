@@ -29,6 +29,18 @@ namespace Magicord.GraphQL.QueryTypes
       return userService.GetUserCardsById(id);
     }
 
+    [UseProjection]
+    public IQueryable<UserShare> GetUserShares([Service] IUserService userService, long id)
+    {
+      return userService.GetUserSharesById(id);
+    }
+
+    [UseProjection]
+    public IQueryable<UserShort> GetUserShorts([Service] IUserService userService, long id)
+    {
+      return userService.GetUserShortsById(id);
+    }
+
     public UserStatsDto GetUserStats([Service] IUserService userService, long id)
     {
       return userService.GetUserStats(id);
