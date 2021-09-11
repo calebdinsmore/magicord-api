@@ -11,6 +11,7 @@ namespace Magicord.Models
     public int Quantity { get; set; }
     public int AmountNonFoil { get; set; }
     public int AmountFoil { get; set; }
+    public bool IsLocked { get; set; }
     [GraphQLIgnore]
     public uint xmin { get; set; }
 

@@ -123,7 +123,8 @@ namespace Magicord.Modules.Shop
 
       var extraCards = user.UserCards
         .Where(x =>
-          (x.Card.Supertypes == null || !x.Card.Supertypes.StartsWith("Basic"))
+          !x.IsLocked
+          && (x.Card.Supertypes == null || !x.Card.Supertypes.StartsWith("Basic"))
           && !exceptionCards.Contains(x.Card.Name)
           && (x.AmountFoil > amount || x.AmountNonFoil > amount));
 
@@ -156,6 +157,25 @@ namespace Magicord.Modules.Shop
         NumCardsSold = numCardsSold,
         TotalPayout = totalPayout
       };
+    }
+
+    public UserCard BuylistLock(long userId, long cardId)
+    {
+      var user = _dataContext.Users
+        .Include(u => u.UserCards).ThenInclude(uc => uc.Card)
+        .FirstOrDefault(u => u.Id == userId);
+      if (user == null)
+      {
+        throw new QueryException("Could not find user. Have you done `mc start`?");
+      }
+      var userCard = user.UserCards.FirstOrDefault(uc => uc.Card.Id == cardId);
+      if (userCard == null)
+      {
+        throw new QueryException("Could not a find a card belonging to you matching that id.");
+      }
+      userCard.IsLocked = !userCard.IsLocked;
+      _dataContext.SaveChanges();
+      return userCard;
     }
   }
 }
