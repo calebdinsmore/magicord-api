@@ -84,15 +84,17 @@ namespace Magicord.Modules.Users
           throw new QueryException("You cannot sell for a dollar amount greater than the current value of your shares.");
         }
       }
-
-      if (DollarAmount > user.Balance)
+      else
       {
-        throw new QueryException("Insufficient funds to place order.");
-      }
+        if (ShareAmount * currentValue > user.Balance)
+        {
+          throw new QueryException("Insufficient funds to place order.");
+        }
 
-      if (ShareAmount * currentValue > user.Balance)
-      {
-        throw new QueryException("Insufficient funds to place order.");
+        if (DollarAmount > user.Balance)
+        {
+          throw new QueryException("Insufficient funds to place order.");
+        }
       }
     }
   }
