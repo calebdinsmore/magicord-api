@@ -5,6 +5,7 @@ using Magicord.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Npgsql;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Magicord.Models
 {

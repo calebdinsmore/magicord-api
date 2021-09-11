@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using HotChocolate.Execution;
 using Magicord.Models;
@@ -72,12 +73,22 @@ namespace Magicord.Modules.Users
           throw new QueryException("You do not own shares of this card.");
         }
 
+        if (Math.Round(ShareAmount ?? 0, 2) == Math.Round(existingShares.Amount, 2))
+        {
+          ShareAmount = existingShares.Amount;
+        }
+
         if (ShareAmount > existingShares.Amount)
         {
           throw new QueryException("You cannot sell an amount of shares greater than the amount you own.");
         }
 
         var currentShareValue = existingShares.Amount * currentValue;
+
+        if (Math.Round(DollarAmount ?? 0, 2) == Math.Round(currentShareValue, 2))
+        {
+          DollarAmount = currentShareValue;
+        }
 
         if (DollarAmount > currentShareValue)
         {

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Magicord.Models;
 
 namespace Magicord.Modules.Users
@@ -24,16 +25,16 @@ namespace Magicord.Modules.Users
 
     List<UserCollectionValueChangeDto> GetChangeInUserCollectionValues();
 
-    StockTransactionResultDto BuyShares(StockTransactionInputDto input);
+    Task<StockTransactionResultDto> BuySharesAsync(StockTransactionInputDto input);
 
-    StockTransactionResultDto SellShares(StockTransactionInputDto input);
+    Task<StockTransactionResultDto> SellSharesAsync(StockTransactionInputDto input);
 
-    StockTransactionResultDto ShortShares(StockTransactionInputDto input);
+    Task<StockTransactionResultDto> ShortSharesAsync(StockTransactionInputDto input);
 
     StockTransactionResultDto AddToShortCashReserve(ShortAdjustmentInputDto input);
 
-    StockTransactionResultDto ReduceShortPosition(ShortAdjustmentInputDto input);
+    Task<StockTransactionResultDto> ReduceShortPositionAsync(ShortAdjustmentInputDto input);
 
-    StockTransactionResultDto CloseShortPosition(ShortAdjustmentInputDto input);
+    Task<StockTransactionResultDto> CloseShortPositionAsync(ShortAdjustmentInputDto input);
   }
 }

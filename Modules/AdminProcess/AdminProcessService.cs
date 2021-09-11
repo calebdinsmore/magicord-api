@@ -50,27 +50,34 @@ namespace Magicord.Modules.AdminProcess
       _dataContext.SaveChanges();
     }
 
+    public void ArchiveCardPrice(CardPrice cardPrice)
+    {
+      _dataContext.Add(new CardPriceHistory
+      {
+        CardUuid = cardPrice.CardUuid,
+        BuylistFoil = cardPrice.CurrentBuylistFoil,
+        BuylistNonFoil = cardPrice.CurrentBuylistNonFoil,
+        RetailFoil = cardPrice.CurrentRetailFoil,
+        RetailNonFoil = cardPrice.CurrentRetailNonFoil,
+        DateRecorded = DateTime.Now,
+        CardPriceId = cardPrice.Id
+      });
+    }
+
     private void ArchiveCurrentPrices()
     {
+      var oneDayAgo = DateTime.Now.Subtract(TimeSpan.FromDays(1));
       var cardPrices = _dataContext.CardPrices
-        .Include(x => x.CardPriceHistories);
+        .Include(x => x.CardPriceHistories)
+        .Where(x => !x.CardPriceHistories.Any(y => y.DateRecorded > oneDayAgo));
 
       foreach (var cardPrice in cardPrices)
       {
-        _dataContext.Add(new CardPriceHistory
-        {
-          CardUuid = cardPrice.CardUuid,
-          BuylistFoil = cardPrice.CurrentBuylistFoil,
-          BuylistNonFoil = cardPrice.CurrentBuylistNonFoil,
-          RetailFoil = cardPrice.CurrentRetailFoil,
-          RetailNonFoil = cardPrice.CurrentRetailNonFoil,
-          DateRecorded = DateTime.Now,
-          CardPriceId = cardPrice.Id
-        });
+        ArchiveCardPrice(cardPrice);
       }
 
-      var thirtyDaysAgo = DateTime.Now.Subtract(TimeSpan.FromDays(30));
-      var oldCardPrices = _dataContext.CardPriceHistories.Where(x => x.DateRecorded < thirtyDaysAgo);
+      var sevenDaysAgo = DateTime.Now.Subtract(TimeSpan.FromDays(7));
+      var oldCardPrices = _dataContext.CardPriceHistories.Where(x => x.DateRecorded < sevenDaysAgo);
       _dataContext.RemoveRange(oldCardPrices);
     }
 

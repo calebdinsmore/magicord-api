@@ -31,6 +31,7 @@ using Magicord.Modules.Shop;
 using Magicord.Modules.AdminProcess;
 using Magicord.Modules.Cards;
 using Magicord.Modules.SealedEvents;
+using Magicord.Modules.Integration.TcgPlayer;
 
 namespace Magicord
 {
@@ -111,6 +112,7 @@ namespace Magicord
       services.AddScoped<IAdminProcessService, AdminProcessService>();
       services.AddScoped<ICardService, CardService>();
       services.AddScoped<ISealedEventService, SealedEventService>();
+      services.AddScoped<ITcgPlayerService, TcgPlayerService>();
       services.AddSingleton<Random>();
     }
 

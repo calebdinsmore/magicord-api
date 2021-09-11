@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
 using Magicord.Models;
@@ -17,24 +18,24 @@ namespace Magicord.GraphQL.MutationTypes
       return userService.AddToUserBalance(input);
     }
 
-    public StockTransactionResultDto BuyShares([Service] IUserService userService, StockTransactionInputDto input)
+    public Task<StockTransactionResultDto> BuyShares([Service] IUserService userService, StockTransactionInputDto input)
     {
-      return userService.BuyShares(input);
+      return userService.BuySharesAsync(input);
     }
 
-    public StockTransactionResultDto SellShares([Service] IUserService userService, StockTransactionInputDto input)
+    public Task<StockTransactionResultDto> SellShares([Service] IUserService userService, StockTransactionInputDto input)
     {
-      return userService.SellShares(input);
+      return userService.SellSharesAsync(input);
     }
 
-    public StockTransactionResultDto ShortShares([Service] IUserService userService, StockTransactionInputDto input)
+    public Task<StockTransactionResultDto> ShortShares([Service] IUserService userService, StockTransactionInputDto input)
     {
-      return userService.ShortShares(input);
+      return userService.ShortSharesAsync(input);
     }
 
-    public StockTransactionResultDto ReduceShort([Service] IUserService userService, ShortAdjustmentInputDto input)
+    public Task<StockTransactionResultDto> ReduceShort([Service] IUserService userService, ShortAdjustmentInputDto input)
     {
-      return userService.ReduceShortPosition(input);
+      return userService.ReduceShortPositionAsync(input);
     }
 
     public StockTransactionResultDto BolsterShort([Service] IUserService userService, ShortAdjustmentInputDto input)
@@ -42,9 +43,9 @@ namespace Magicord.GraphQL.MutationTypes
       return userService.AddToShortCashReserve(input);
     }
 
-    public StockTransactionResultDto CloseShort([Service] IUserService userService, ShortAdjustmentInputDto input)
+    public Task<StockTransactionResultDto> CloseShort([Service] IUserService userService, ShortAdjustmentInputDto input)
     {
-      return userService.CloseShortPosition(input);
+      return userService.CloseShortPositionAsync(input);
     }
   }
 }

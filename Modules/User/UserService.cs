@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -5,6 +6,8 @@ using AutoMapper;
 using HotChocolate.Execution;
 using Magicord.Core.Exceptions;
 using Magicord.Models;
+using Magicord.Modules.AdminProcess;
+using Magicord.Modules.Integration.TcgPlayer;
 using Magicord.Modules.Users.Dto;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,10 +17,14 @@ namespace Magicord.Modules.Users
   {
     private readonly MagicordContext _dataContext;
     private readonly IMapper _mapper;
-    public UserService(MagicordContext dataContext, IMapper mapper)
+    private readonly ITcgPlayerService _tcgPlayerService;
+    private readonly IAdminProcessService _adminProcessService;
+    public UserService(MagicordContext dataContext, IMapper mapper, ITcgPlayerService tcgPlayerService, IAdminProcessService adminProcessService)
     {
       _dataContext = dataContext;
       _mapper = mapper;
+      _tcgPlayerService = tcgPlayerService;
+      _adminProcessService = adminProcessService;
     }
 
     public IEnumerable<UserDto> GetAll()
@@ -132,13 +139,14 @@ namespace Magicord.Modules.Users
         ?.UserCards.AsQueryable();
     }
 
-    public StockTransactionResultDto BuyShares(StockTransactionInputDto input)
+    public async Task<StockTransactionResultDto> BuySharesAsync(StockTransactionInputDto input)
     {
       input.OrderType = OrderTypeEnum.Buy;
       input.Validate(_dataContext);
       var existingShares = _dataContext.UserShares.FirstOrDefault(x => x.UserId == input.UserId && x.CardId == input.CardId && x.IsFoil == input.IsFoil);
       var user = _dataContext.Users.FirstOrDefault(x => x.Id == input.UserId);
       var card = _dataContext.Cards.Include(x => x.CardPrice).FirstOrDefault(x => x.Id == input.CardId);
+      await HandleChangedPriceAsync(card, input.IsFoil);
       var cardShareValue = input.IsFoil ? card.CardPrice.CurrentRetailFoil : card.CardPrice.CurrentRetailNonFoil;
       var orderValue = input.DollarAmount ?? 0;
       if (orderValue == 0)
@@ -179,13 +187,14 @@ namespace Magicord.Modules.Users
       };
     }
 
-    public StockTransactionResultDto SellShares(StockTransactionInputDto input)
+    public async Task<StockTransactionResultDto> SellSharesAsync(StockTransactionInputDto input)
     {
       input.OrderType = OrderTypeEnum.Sell;
       input.Validate(_dataContext);
       var existingShares = _dataContext.UserShares.FirstOrDefault(x => x.UserId == input.UserId && x.CardId == input.CardId && x.IsFoil == input.IsFoil);
       var user = _dataContext.Users.FirstOrDefault(x => x.Id == input.UserId);
       var card = _dataContext.Cards.Include(x => x.CardPrice).FirstOrDefault(x => x.Id == input.CardId);
+      await HandleChangedPriceAsync(card, input.IsFoil);
       var cardShareValue = input.IsFoil ? card.CardPrice.CurrentRetailFoil : card.CardPrice.CurrentRetailNonFoil;
       var orderValue = input.DollarAmount ?? 0;
       if (orderValue == 0)
@@ -217,13 +226,14 @@ namespace Magicord.Modules.Users
       };
     }
 
-    public StockTransactionResultDto ShortShares(StockTransactionInputDto input)
+    public async Task<StockTransactionResultDto> ShortSharesAsync(StockTransactionInputDto input)
     {
       input.OrderType = OrderTypeEnum.Short;
       input.Validate(_dataContext);
       var existingShorts = _dataContext.UserShorts.FirstOrDefault(x => x.UserId == input.UserId && x.CardId == input.CardId && x.IsFoil == input.IsFoil);
       var user = _dataContext.Users.FirstOrDefault(x => x.Id == input.UserId);
       var card = _dataContext.Cards.Include(x => x.CardPrice).FirstOrDefault(x => x.Id == input.CardId);
+      await HandleChangedPriceAsync(card, input.IsFoil);
       var cardShareValue = input.IsFoil ? card.CardPrice.CurrentRetailFoil : card.CardPrice.CurrentRetailNonFoil;
       var orderValue = input.DollarAmount ?? 0;
       if (orderValue == 0)
@@ -292,7 +302,7 @@ namespace Magicord.Modules.Users
       };
     }
 
-    public StockTransactionResultDto ReduceShortPosition(ShortAdjustmentInputDto input)
+    public async Task<StockTransactionResultDto> ReduceShortPositionAsync(ShortAdjustmentInputDto input)
     {
       input.Validate(_dataContext);
       var user = _dataContext.Users.FirstOrDefault(x => x.Id == input.UserId);
@@ -302,6 +312,7 @@ namespace Magicord.Modules.Users
         throw new QueryException("You can't reduce a short position that's in the red. Either close the position with `mc stocks close_short` or add to its reserves with `mc stocks bolster_short`.");
       }
       var card = _dataContext.Cards.Include(x => x.CardPrice).FirstOrDefault(x => x.Id == input.CardId);
+      await HandleChangedPriceAsync(card, input.IsFoil);
       var cardShareValue = input.IsFoil ? card.CardPrice.CurrentRetailFoil : card.CardPrice.CurrentRetailNonFoil;
       var orderValue = input.DollarAmount ?? 0;
       if (orderValue == 0)
@@ -334,7 +345,7 @@ namespace Magicord.Modules.Users
       };
     }
 
-    public StockTransactionResultDto CloseShortPosition(ShortAdjustmentInputDto input)
+    public async Task<StockTransactionResultDto> CloseShortPositionAsync(ShortAdjustmentInputDto input)
     {
       var userShort = _dataContext.UserShorts.FirstOrDefault(x => x.CardId == input.CardId && x.IsFoil == input.IsFoil && x.UserId == input.UserId);
       if (userShort == null)
@@ -344,7 +355,7 @@ namespace Magicord.Modules.Users
       if (!userShort.IsRed)
       {
         input.ShareAmount = userShort.Amount;
-        return ReduceShortPosition(input);
+        return await ReduceShortPositionAsync(input);
       }
       _dataContext.Remove(userShort);
       _dataContext.SaveChanges();
@@ -363,6 +374,55 @@ namespace Magicord.Modules.Users
     public IQueryable<UserShort> GetUserShortsById(long id)
     {
       return _dataContext.UserShorts.Where(x => x.UserId == id);
+    }
+
+    private async Task HandleChangedPriceAsync(Card card, bool isFoil)
+    {
+      var changedPrice = await CheckForPriceChangeAsync(card, isFoil);
+      if (changedPrice != 0)
+      {
+        throw new QueryException($"Market price for {card.Name} has changed to ${changedPrice}.\nIf you still want to place your order, rerun your command.");
+      }
+    }
+
+    private async Task<decimal> CheckForPriceChangeAsync(Card card, bool isFoil)
+    {
+      try
+      {
+        if (card.TcgplayerProductId == null)
+        {
+          return 0;
+        }
+        var currentMarketPrice = isFoil ? card.CardPrice.CurrentRetailFoil : card.CardPrice.CurrentRetailNonFoil;
+        var pricePoints = await _tcgPlayerService.GetCardPricePoints(card.TcgplayerProductId);
+        var pricePoint = isFoil ? pricePoints.FirstOrDefault(x => x.PrintingType == PrintingTypeEnum.Foil) : pricePoints.FirstOrDefault(x => x.PrintingType == PrintingTypeEnum.Normal);
+        var marketPrice = pricePoint?.MarketPrice ?? 0;
+        if (marketPrice == 0)
+        {
+          return 0;
+        }
+        if (pricePoint.MarketPrice != currentMarketPrice)
+        {
+          _adminProcessService.ArchiveCardPrice(card.CardPrice);
+          if (isFoil)
+          {
+            card.CardPrice.CurrentRetailFoil = marketPrice;
+          }
+          else
+          {
+            card.CardPrice.CurrentRetailNonFoil = marketPrice;
+          }
+          _dataContext.SaveChanges();
+          return marketPrice;
+        }
+        return 0;
+      }
+      catch (System.Exception e)
+      {
+        Console.WriteLine($"Encountered an error fetching latest prices for {card.Id}.\n{e.ToString()}");
+
+        return 0;
+      }
     }
   }
 }

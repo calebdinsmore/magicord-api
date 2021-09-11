@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Magicord.Models;
 
 namespace Magicord.Modules.AdminProcess
 {
@@ -6,5 +7,6 @@ namespace Magicord.Modules.AdminProcess
   {
     Task PullDownMtgJsonData();
     Task UpdateCardPrices(string dummyArg);
+    void ArchiveCardPrice(CardPrice cardPrice);
   }
 }
