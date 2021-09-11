@@ -9,6 +9,6 @@ namespace Magicord.Modules.Shop
 
     BuylistBulkResultDto BuylistAll(long userId);
 
-    BuylistBulkResultDto BuylistExtra(long userId);
+    BuylistBulkResultDto BuylistExtra(long userId, int amount = 4);
   }
 }

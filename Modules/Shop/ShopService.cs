@@ -103,7 +103,7 @@ namespace Magicord.Modules.Shop
       };
     }
 
-    public BuylistBulkResultDto BuylistExtra(long userId)
+    public BuylistBulkResultDto BuylistExtra(long userId, int amount = 4)
     {
       var exceptionCards = new List<string>(new string[]
       {
@@ -125,29 +125,29 @@ namespace Magicord.Modules.Shop
         .Where(x =>
           (x.Card.Supertypes == null || !x.Card.Supertypes.StartsWith("Basic"))
           && !exceptionCards.Contains(x.Card.Name)
-          && (x.AmountFoil > 4 || x.AmountNonFoil > 4));
+          && (x.AmountFoil > amount || x.AmountNonFoil > amount));
 
       var totalPayout = 0M;
       var numCardsSold = 0;
       foreach (var userCard in extraCards)
       {
-        if (userCard.AmountNonFoil > 4)
+        if (userCard.AmountNonFoil > amount)
         {
-          var amountToSell = userCard.AmountNonFoil - 4;
+          var amountToSell = userCard.AmountNonFoil - amount;
           var payout = amountToSell * userCard.Card.CardPrice.CurrentBuylistNonFoil;
           user.Balance += payout;
           totalPayout += payout;
           numCardsSold += amountToSell;
-          userCard.AmountNonFoil = 4;
+          userCard.AmountNonFoil = amount;
         }
-        if (userCard.AmountFoil > 4)
+        if (userCard.AmountFoil > amount)
         {
-          var amountToSell = userCard.AmountFoil - 4;
+          var amountToSell = userCard.AmountFoil - amount;
           var payout = amountToSell * userCard.Card.CardPrice.CurrentBuylistFoil;
           user.Balance += payout;
           totalPayout += payout;
           numCardsSold += amountToSell;
-          userCard.AmountFoil = 4;
+          userCard.AmountFoil = amount;
         }
       }
       _dataContext.SaveChanges();
