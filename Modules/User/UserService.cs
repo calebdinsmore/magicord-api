@@ -112,7 +112,7 @@ namespace Magicord.Modules.Users
       {
         Balance = user.Balance,
         BuylistValue = user.UserCards.Sum(x => (x.Card.CardPrice.CurrentBuylistNonFoil * x.AmountNonFoil) + (x.Card.CardPrice.CurrentBuylistFoil * x.AmountFoil)),
-        LongPositionValue = user.UserShares.Sum(x => x.CurrentValue),
+        LongPositionValue = user.UserShares.Sum(x => x.CurrentValue * x.Amount),
         ShortPositionValue = user.UserShorts.Sum(x => x.ReservedCash - (x.BuybackCost * x.Amount)),
         NumberOfCardsOwned = user.UserCards.Sum(x => x.AmountFoil + x.AmountNonFoil)
       };
