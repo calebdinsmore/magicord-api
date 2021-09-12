@@ -11,6 +11,8 @@ namespace Magicord.Models
     public uint xmin { get; set; }
 
     public virtual ICollection<UserCard> UserCards { get; set; }
+    public virtual ICollection<UserShare> UserShares { get; set; }
+    public virtual ICollection<UserShort> UserShorts { get; set; }
     public virtual ICollection<UserBooster> UserBoosters { get; set; }
   }
 }

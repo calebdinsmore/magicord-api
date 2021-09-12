@@ -101,13 +101,19 @@ namespace Magicord.Modules.Users
 
     public UserStatsDto GetUserStats(long id)
     {
-      var user = _dataContext.Users.Include(x => x.UserCards).ThenInclude(x => x.Card).ThenInclude(x => x.CardPrice).Where(x => x.Id == id).FirstOrDefault();
+      var user = _dataContext.Users
+        .AsSplitQuery()
+        .Include(x => x.UserCards).ThenInclude(x => x.Card).ThenInclude(x => x.CardPrice)
+        .Include(x => x.UserShares).ThenInclude(x => x.Card).ThenInclude(x => x.CardPrice)
+        .Include(x => x.UserShorts).ThenInclude(x => x.Card).ThenInclude(x => x.CardPrice)
+        .Where(x => x.Id == id)
+        .FirstOrDefault();
       return new UserStatsDto
       {
         Balance = user.Balance,
-        NetWorth =
-          user.Balance +
-          user.UserCards.Sum(x => (x.Card.CardPrice.CurrentBuylistNonFoil * x.AmountNonFoil) + (x.Card.CardPrice.CurrentBuylistFoil * x.AmountFoil)),
+        BuylistValue = user.UserCards.Sum(x => (x.Card.CardPrice.CurrentBuylistNonFoil * x.AmountNonFoil) + (x.Card.CardPrice.CurrentBuylistFoil * x.AmountFoil)),
+        LongPositionValue = user.UserShares.Sum(x => x.CurrentValue),
+        ShortPositionValue = user.UserShorts.Sum(x => x.ReservedCash - (x.BuybackCost * x.Amount)),
         NumberOfCardsOwned = user.UserCards.Sum(x => x.AmountFoil + x.AmountNonFoil)
       };
     }
