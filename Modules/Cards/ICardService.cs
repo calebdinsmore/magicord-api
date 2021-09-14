@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Magicord.Models;
 
 namespace Magicord.Modules.Cards
 {
   public interface ICardService
   {
-    IQueryable<Card> GetCardsMatchingQuery(CardSearchInputDto input);
+    Task<IQueryable<Card>> GetCardsMatchingQuery(CardSearchInputDto input);
   }
 }

@@ -4,5 +4,7 @@ namespace Magicord.Modules.Cards
   {
     public string Name { get; set; }
     public string SetCode { get; set; }
+
+    public bool UpdatePrices { get; set; }
   }
 }

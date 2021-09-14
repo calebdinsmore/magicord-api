@@ -47,5 +47,11 @@ namespace Magicord.GraphQL.MutationTypes
     {
       return userService.CloseShortPositionAsync(input);
     }
+
+    public async Task<bool> SyncPortfolio([Service] IUserService userService, long userId)
+    {
+      await userService.SyncPortfolio(userId);
+      return true;
+    }
   }
 }

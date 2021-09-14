@@ -331,6 +331,11 @@ namespace Magicord.Modules.Users
         shareAmount = (input.DollarAmount ?? 0) / cardShareValue;
       }
 
+      if (shareAmount > userShort.Amount)
+      {
+        throw new QueryException($"You cannot reduce a short by more shares ({shareAmount}) than you've shorted ({userShort.Amount}).");
+      }
+
       userShort.ReservedCash -= orderValue * 2;
       user.Balance += orderValue;
       userShort.Amount -= shareAmount;
@@ -382,16 +387,29 @@ namespace Magicord.Modules.Users
       return _dataContext.UserShorts.Where(x => x.UserId == id);
     }
 
-    private async Task HandleChangedPriceAsync(Card card, bool isFoil)
+    public async Task SyncPortfolio(long userId)
     {
-      var changedPrice = await CheckForPriceChangeAsync(card, isFoil);
-      if (changedPrice != 0)
+      var user = _dataContext.Users
+        .Include(x => x.UserShares).ThenInclude(x => x.Card).ThenInclude(x => x.CardPrice)
+        .Include(x => x.UserShorts).ThenInclude(x => x.Card).ThenInclude(x => x.CardPrice)
+        .FirstOrDefault(x => x.Id == userId);
+
+      if (user == null)
       {
-        throw new QueryException($"Market price for {card.Name} has changed to ${changedPrice}.\nIf you still want to place your order, rerun your command.");
+        throw new QueryException("No user found. Have you done `mc start`?");
+      }
+
+      foreach (var share in user.UserShares)
+      {
+        await CheckForPriceChangeAsync(share.Card, share.IsFoil);
+      }
+      foreach (var userShort in user.UserShorts)
+      {
+        await CheckForPriceChangeAsync(userShort.Card, userShort.IsFoil);
       }
     }
 
-    private async Task<decimal> CheckForPriceChangeAsync(Card card, bool isFoil)
+    public async Task<decimal> CheckForPriceChangeAsync(Card card, bool isFoil)
     {
       try
       {
@@ -428,6 +446,15 @@ namespace Magicord.Modules.Users
         Console.WriteLine($"Encountered an error fetching latest prices for {card.Id}.\n{e.ToString()}");
 
         return 0;
+      }
+    }
+
+    private async Task HandleChangedPriceAsync(Card card, bool isFoil)
+    {
+      var changedPrice = await CheckForPriceChangeAsync(card, isFoil);
+      if (changedPrice != 0)
+      {
+        throw new QueryException($"Market price for {card.Name} has changed to ${changedPrice}.\nIf you still want to place your order, rerun your command.");
       }
     }
   }

@@ -36,5 +36,9 @@ namespace Magicord.Modules.Users
     Task<StockTransactionResultDto> ReduceShortPositionAsync(ShortAdjustmentInputDto input);
 
     Task<StockTransactionResultDto> CloseShortPositionAsync(ShortAdjustmentInputDto input);
+
+    Task SyncPortfolio(long userId);
+
+    Task<decimal> CheckForPriceChangeAsync(Card card, bool isFoil);
   }
 }
