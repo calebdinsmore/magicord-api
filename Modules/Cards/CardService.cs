@@ -44,7 +44,7 @@ namespace Magicord.Modules.Cards
 
       if (exactMatch.Any())
       {
-        if (input.UpdatePrices && exactMatch.Count() < 5)
+        if (input.UpdatePrices && exactMatch.Count() < 4)
         {
           foreach (var card in exactMatch.ToList())
           {
@@ -65,7 +65,7 @@ namespace Magicord.Modules.Cards
 
       if (!string.IsNullOrEmpty(input.SetCode))
       {
-        matchingCards = matchingCards.Where(x => x.SetCode == input.SetCode);
+        matchingCards = matchingCards.Where(x => x.SetCode.ToLower() == input.SetCode.ToLower());
       }
 
       if (matchingCards.Select(x => x.Name).Distinct().Count() > 1)
