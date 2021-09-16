@@ -11,6 +11,7 @@ namespace Magicord.Modules.SealedEvents
     List<UserPacks> DistributeUserPacks(long sealedEventId);
     SealedEvent CreateSealedEvent(CreateSealedEventInputDto input);
     SealedEventPack AddPackToSealedEvent(AddPackToSealedInputDto input);
+    SealedEventPromo AddPromoToSealedEvent(AddPromoToSealedInputDto input);
     SealedEventAttendee AddSealedEventAttendee(AddSealedEventAttendeeInputDto input);
   }
 }

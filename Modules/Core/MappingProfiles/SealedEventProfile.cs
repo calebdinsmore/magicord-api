@@ -11,6 +11,7 @@ namespace Magicord.Modules.Core.MappingProfiles
       CreateMap<SealedEvent, CreateSealedEventInputDto>().ReverseMap();
       CreateMap<SealedEventPack, AddPackToSealedInputDto>().ReverseMap();
       CreateMap<SealedEventAttendee, AddSealedEventAttendeeInputDto>().ReverseMap();
+      CreateMap<SealedEventPromo, AddPromoToSealedInputDto>().ReverseMap();
     }
   }
 }

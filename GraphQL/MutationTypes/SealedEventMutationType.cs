@@ -23,6 +23,11 @@ namespace Magicord.GraphQL.MutationTypes
       return service.AddPackToSealedEvent(input);
     }
 
+    public SealedEventPromo AddPromoToSealedEvent([Service] ISealedEventService service, AddPromoToSealedInputDto input)
+    {
+      return service.AddPromoToSealedEvent(input);
+    }
+
     public SealedEventAttendee AddSealedEventAttendee([Service] ISealedEventService service, AddSealedEventAttendeeInputDto input)
     {
       return service.AddSealedEventAttendee(input);

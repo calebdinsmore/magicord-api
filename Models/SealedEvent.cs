@@ -14,5 +14,6 @@ namespace Magicord.Models
 
     public virtual ICollection<SealedEventAttendee> SealedEventAttendees { get; set; }
     public virtual ICollection<SealedEventPack> SealedEventPacks { get; set; }
+    public virtual ICollection<SealedEventPromo> SealedEventPromos { get; set; }
   }
 }

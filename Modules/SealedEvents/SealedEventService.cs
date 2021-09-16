@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
@@ -32,6 +33,7 @@ namespace Magicord.Modules.SealedEvents
         .ThenInclude(x => x.User)
         .ThenInclude(x => x.UserCards)
         .Include(x => x.SealedEventPacks)
+        .Include(x => x.SealedEventPromos)
         .FirstOrDefault(x => x.Id == sealedEventId);
 
       if (sealedEvent == null)
@@ -59,6 +61,21 @@ namespace Magicord.Modules.SealedEvents
             _boosterService.AddBoosterCardsToUser(pack.Cards, attendee.User);
           }
         }
+        foreach (var promo in sealedEvent.SealedEventPromos)
+        {
+          var promoCard = GetPromoCard(promo);
+          var boosterCards = new List<BoosterCardDto>
+          {
+            new BoosterCardDto { Card = promoCard, Foil = promoCard.HasFoil }
+          };
+          _boosterService.AddBoosterCardsToUser(boosterCards, attendee.User);
+          allUserPacks.Add(new UserPacks
+          {
+            UserId = attendee.UserId,
+            PromoCard = promoCard
+          });
+
+        }
         attendee.HasBeenGivenPacks = true;
       }
       _dataContext.SaveChanges();
@@ -72,6 +89,15 @@ namespace Magicord.Modules.SealedEvents
       _dataContext.Add(newPack);
       _dataContext.SaveChanges();
       return newPack;
+    }
+
+    public SealedEventPromo AddPromoToSealedEvent(AddPromoToSealedInputDto input)
+    {
+      input.Validate(_dataContext);
+      var promo = _mapper.Map<SealedEventPromo>(input);
+      _dataContext.Add(promo);
+      _dataContext.SaveChanges();
+      return promo;
     }
 
     public SealedEventAttendee AddSealedEventAttendee(AddSealedEventAttendeeInputDto input)
@@ -96,6 +122,22 @@ namespace Magicord.Modules.SealedEvents
       _dataContext.Add(newEvent);
       _dataContext.SaveChanges();
       return newEvent;
+    }
+
+    private Card GetPromoCard(SealedEventPromo promo)
+    {
+      var card = _dataContext.Cards
+      .Where(
+        x => (x.Rarity.ToString().ToLower() == "mythic" || x.Rarity.ToString().ToLower() == "rare")
+        && EF.Functions.ILike(x.PromoTypes, $"%{promo.PromoType}%")
+        && x.SetCode.ToLower() == promo.SetCode.ToLower()
+        && (x.Side == null || x.Side == "a")
+      ).OrderBy(x => Guid.NewGuid()).FirstOrDefault();
+      if (card == null)
+      {
+        throw new QueryException("Unable to select a promo card.");
+      }
+      return card;
     }
   }
 }

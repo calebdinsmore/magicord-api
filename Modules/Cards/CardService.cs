@@ -46,7 +46,8 @@ namespace Magicord.Modules.Cards
       {
         if (input.UpdatePrices && exactMatch.Count() < 4)
         {
-          foreach (var card in exactMatch.ToList())
+          var materializedCards = exactMatch.ToList();
+          foreach (var card in materializedCards)
           {
             await CheckForPriceChangeAsync(card);
           }
@@ -75,7 +76,8 @@ namespace Magicord.Modules.Cards
 
       if (input.UpdatePrices && matchingCards.Count() < 5)
       {
-        foreach (var card in matchingCards.ToList())
+        var materializedCards = matchingCards.ToList();
+        foreach (var card in materializedCards)
         {
           await CheckForPriceChangeAsync(card);
         }
