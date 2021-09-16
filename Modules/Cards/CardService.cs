@@ -98,7 +98,7 @@ namespace Magicord.Modules.Cards
         var foilPrice = pricePoints.FirstOrDefault(x => x.PrintingType == PrintingTypeEnum.Foil)?.MarketPrice ?? 0;
         var nonFoilPrice = pricePoints.FirstOrDefault(x => x.PrintingType == PrintingTypeEnum.Normal)?.MarketPrice ?? 0;
 
-        if (foilPrice != card.CardPrice.CurrentRetailFoil || nonFoilPrice != card.CardPrice.CurrentRetailNonFoil)
+        if (foilPrice != card?.CardPrice?.CurrentRetailFoil || nonFoilPrice != card?.CardPrice?.CurrentRetailNonFoil)
         {
           _adminProcessService.ArchiveCardPrice(card.CardPrice);
           card.CardPrice.CurrentRetailFoil = foilPrice;
