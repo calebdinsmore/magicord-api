@@ -24,7 +24,7 @@ namespace Magicord.Modules.SealedEvents
         throw new QueryException("Couldn't find a set matching that set code.");
       }
 
-      if (!context.Cards.Where(x => x.SetCode.ToLower() == SetCode.ToLower())
+      if (PromoType != null && !context.Cards.Where(x => x.SetCode.ToLower() == SetCode.ToLower())
             .Any(x => EF.Functions.ILike(x.PromoTypes, $"%{PromoType}%")))
       {
         throw new QueryException($"There aren't cards matching that promo type in {SetCode}.");

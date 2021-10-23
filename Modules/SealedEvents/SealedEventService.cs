@@ -118,6 +118,7 @@ namespace Magicord.Modules.SealedEvents
     public SealedEvent CreateSealedEvent(CreateSealedEventInputDto input)
     {
       var newEvent = _mapper.Map<SealedEvent>(input);
+      newEvent.IsActive = true;
       newEvent.PacksAreDistributed = false;
       _dataContext.Add(newEvent);
       _dataContext.SaveChanges();
@@ -129,7 +130,7 @@ namespace Magicord.Modules.SealedEvents
       var card = _dataContext.Cards
       .Where(
         x => (x.Rarity.ToString().ToLower() == "mythic" || x.Rarity.ToString().ToLower() == "rare")
-        && EF.Functions.ILike(x.PromoTypes, $"%{promo.PromoType}%")
+        && (promo.PromoType != null ? EF.Functions.ILike(x.PromoTypes, $"%{promo.PromoType}%") : x.PromoTypes == null)
         && x.SetCode.ToLower() == promo.SetCode.ToLower()
         && (x.Side == null || x.Side == "a")
       ).OrderBy(x => Guid.NewGuid()).FirstOrDefault();
