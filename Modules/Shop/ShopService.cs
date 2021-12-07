@@ -159,6 +159,30 @@ namespace Magicord.Modules.Shop
       };
     }
 
+    public BuylistBulkResultDto BuylistFoils(long userId)
+    {
+      var user = _dataContext.Users.Include(x => x.UserCards).ThenInclude(x => x.Card).ThenInclude(x => x.CardPrice).FirstOrDefault(x => x.Id == userId);
+      if (user == null)
+      {
+        throw new QueryException("Can't find user. Have you done `mc start`?");
+      }
+
+      var foils = user.UserCards.Where(card => card.AmountFoil > 0);
+      var result = new BuylistBulkResultDto();
+      foreach (var userCard in foils)
+      {
+        var payout = userCard.Card.CardPrice.CurrentBuylistFoil * userCard.AmountFoil;
+        result.NumCardsSold += userCard.AmountFoil;
+        result.TotalPayout += payout;
+
+        userCard.AmountFoil = 0;
+      }
+
+      user.Balance += result.TotalPayout;
+      _dataContext.SaveChanges();
+      return result;
+    }
+
     public UserCard BuylistLock(long userId, long cardId)
     {
       var user = _dataContext.Users

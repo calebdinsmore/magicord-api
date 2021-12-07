@@ -11,6 +11,8 @@ namespace Magicord.Modules.Shop
 
     BuylistBulkResultDto BuylistExtra(long userId, int amount = 4);
 
+    BuylistBulkResultDto BuylistFoils(long userId);
+
     UserCard BuylistLock(long userId, long cardId);
   }
 }

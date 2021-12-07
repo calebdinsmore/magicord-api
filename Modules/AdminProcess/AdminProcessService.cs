@@ -60,14 +60,14 @@ namespace Magicord.Modules.AdminProcess
         BuylistNonFoil = cardPrice.CurrentBuylistNonFoil,
         RetailFoil = cardPrice.CurrentRetailFoil,
         RetailNonFoil = cardPrice.CurrentRetailNonFoil,
-        DateRecorded = DateTime.Now,
+        DateRecorded = DateTime.UtcNow,
         CardPriceId = cardPrice.Id
       });
     }
 
     private void ArchiveCurrentPrices()
     {
-      var oneDayAgo = DateTime.Now.Subtract(TimeSpan.FromDays(1));
+      var oneDayAgo = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1));
       var cardPrices = _dataContext.CardPrices
         .Include(x => x.CardPriceHistories)
         .Where(x => !x.CardPriceHistories.Any(y => y.DateRecorded > oneDayAgo));
@@ -77,7 +77,7 @@ namespace Magicord.Modules.AdminProcess
         ArchiveCardPrice(cardPrice);
       }
 
-      var sevenDaysAgo = DateTime.Now.Subtract(TimeSpan.FromDays(7));
+      var sevenDaysAgo = DateTime.UtcNow.Subtract(TimeSpan.FromDays(7));
       var oldCardPrices = _dataContext.CardPriceHistories.Where(x => x.DateRecorded < sevenDaysAgo);
       _dataContext.RemoveRange(oldCardPrices);
     }
