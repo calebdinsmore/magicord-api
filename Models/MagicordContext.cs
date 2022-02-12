@@ -64,10 +64,10 @@ namespace Magicord.Models
           .HasPostgresEnum("dbo", "cards_layout", new[] { "normal", "aftermath", "split", "flip", "leveler", "saga", "vanguard", "transform", "adventure", "meld", "scheme", "planar", "host", "augment" })
           .HasPostgresEnum("dbo", "cards_rarity", new[] { "rare", "uncommon", "common", "mythic", "special", "bonus" })
           .HasPostgresEnum("dbo", "foreign_data_language", new[] { "German", "Spanish", "French", "Italian", "Japanese", "Portuguese (Brazil)", "Russian", "Chinese Simplified", "Korean", "Chinese Traditional", "Phyrexian", "Sanskrit", "Hebrew", "Ancient Greek", "Latin", "Arabic" })
-          .HasPostgresEnum("dbo", "legalities_format", new[] { "commander", "duel", "legacy", "modern", "vintage", "pauper", "penny", "historic", "pioneer", "brawl", "future", "standard", "oldschool" })
+          .HasPostgresEnum("dbo", "legalities_format", new[] { "alchemy", "commander", "duel", "legacy", "modern", "vintage", "pauper", "penny", "historic", "pioneer", "brawl", "future", "standard", "oldschool" })
           .HasPostgresEnum("dbo", "legalities_status", new[] { "Legal", "Banned", "Restricted" })
           .HasPostgresEnum("dbo", "set_translations_language", new[] { "Chinese Simplified", "Chinese Traditional", "French", "German", "Italian", "Japanese", "Korean", "Portuguese (Brazil)", "Russian", "Spanish" })
-          .HasPostgresEnum("dbo", "sets_type", new[] { "core", "masters", "expansion", "starter", "memorabilia", "archenemy", "box", "draft_innovation", "commander", "funny", "duel_deck", "from_the_vault", "masterpiece", "promo", "premium_deck", "planechase", "token", "vanguard", "treasure_chest", "spellbook" })
+          .HasPostgresEnum("dbo", "sets_type", new[] { "alchemy", "core", "masters", "expansion", "starter", "memorabilia", "archenemy", "box", "draft_innovation", "commander", "funny", "duel_deck", "from_the_vault", "masterpiece", "promo", "premium_deck", "planechase", "token", "vanguard", "treasure_chest", "spellbook" })
           .HasPostgresEnum("dbo", "tokens_border_color", new[] { "black", "borderless", "silver", "gold" })
           .HasPostgresEnum("dbo", "tokens_layout", new[] { "token", "double_faced_token", "emblem", "art_series", "normal" });
 

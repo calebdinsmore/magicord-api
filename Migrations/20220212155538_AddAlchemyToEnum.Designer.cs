@@ -5,6 +5,7 @@ using Magicord.Models;
 using Magicord.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -13,9 +14,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Magicord.Migrations
 {
     [DbContext(typeof(MagicordContext))]
-    partial class magicordContextModelSnapshot : ModelSnapshot
+    [Migration("20220212155538_AddAlchemyToEnum")]
+    partial class AddAlchemyToEnum
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,10 +30,10 @@ namespace Magicord.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dbo", "cards_layout", new[] { "normal", "aftermath", "split", "flip", "leveler", "saga", "vanguard", "transform", "adventure", "meld", "scheme", "planar", "host", "augment" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dbo", "cards_rarity", new[] { "rare", "uncommon", "common", "mythic", "special", "bonus" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dbo", "foreign_data_language", new[] { "German", "Spanish", "French", "Italian", "Japanese", "Portuguese (Brazil)", "Russian", "Chinese Simplified", "Korean", "Chinese Traditional", "Phyrexian", "Sanskrit", "Hebrew", "Ancient Greek", "Latin", "Arabic" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dbo", "legalities_format", new[] { "alchemy", "commander", "duel", "legacy", "modern", "vintage", "pauper", "penny", "historic", "pioneer", "brawl", "future", "standard", "oldschool" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dbo", "legalities_format", new[] { "commander", "duel", "legacy", "modern", "vintage", "pauper", "penny", "historic", "pioneer", "brawl", "future", "standard", "oldschool" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dbo", "legalities_status", new[] { "Legal", "Banned", "Restricted" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dbo", "set_translations_language", new[] { "Chinese Simplified", "Chinese Traditional", "French", "German", "Italian", "Japanese", "Korean", "Portuguese (Brazil)", "Russian", "Spanish" });
-            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dbo", "sets_type", new[] { "alchemy", "core", "masters", "expansion", "starter", "memorabilia", "archenemy", "box", "draft_innovation", "commander", "funny", "duel_deck", "from_the_vault", "masterpiece", "promo", "premium_deck", "planechase", "token", "vanguard", "treasure_chest", "spellbook" });
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dbo", "sets_type", new[] { "core", "masters", "expansion", "starter", "memorabilia", "archenemy", "box", "draft_innovation", "commander", "funny", "duel_deck", "from_the_vault", "masterpiece", "promo", "premium_deck", "planechase", "token", "vanguard", "treasure_chest", "spellbook" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dbo", "tokens_border_color", new[] { "black", "borderless", "silver", "gold" });
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "dbo", "tokens_layout", new[] { "token", "double_faced_token", "emblem", "art_series", "normal" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);

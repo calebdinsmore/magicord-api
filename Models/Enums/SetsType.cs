@@ -2,6 +2,7 @@ namespace Magicord.Models.Enums
 {
   public enum SetsType
   {
+    Alchemy,
     Core,
     Masters,
     Expansion,
