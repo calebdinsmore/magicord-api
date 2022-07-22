@@ -40,5 +40,7 @@ namespace Magicord.Modules.Users
     Task SyncPortfolio(long userId);
 
     Task<decimal> CheckForPriceChangeAsync(Card card, bool isFoil);
+
+    DraftDeckImportResultDto ImportDraftDeck(DraftDeckImportInputDto inputDto);
   }
 }

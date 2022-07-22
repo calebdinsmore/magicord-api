@@ -11,6 +11,7 @@ namespace Magicord.Modules.Core.MappingProfiles
     {
       CreateMap<User, UserDto>().ReverseMap();
       CreateMap<User, CreateUserInputDto>().ReverseMap();
+      CreateMap<Card, DraftCardResultDto>().ReverseMap();
     }
   }
 }

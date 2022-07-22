@@ -18,6 +18,11 @@ namespace Magicord.GraphQL.MutationTypes
       return userService.AddToUserBalance(input);
     }
 
+    public DraftDeckImportResultDto ImportDraftDeck([Service] IUserService userService, DraftDeckImportInputDto input)
+    {
+      return userService.ImportDraftDeck(input);
+    }
+
     public Task<StockTransactionResultDto> BuyShares([Service] IUserService userService, StockTransactionInputDto input)
     {
       return userService.BuySharesAsync(input);

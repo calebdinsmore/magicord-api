@@ -14,10 +14,10 @@ namespace Magicord.Controllers
   [ApiController]
   public class UsersController : ControllerBase
   {
-    private readonly IUserService _userManager;
+    private readonly IUserService _userService;
     public UsersController(IUserService userManager)
     {
-      _userManager = userManager;
+      _userService = userManager;
     }
 
     // GET api/users
@@ -47,6 +47,12 @@ namespace Magicord.Controllers
     [HttpDelete("{id}")]
     public void DeleteUserById(int id)
     {
+    }
+
+    [HttpPost("{id}/import-draft")]
+    public ActionResult<DraftDeckImportResultDto> ImportDraftDeck(long id, DraftDeckImportInputDto input)
+    {
+      return _userService.ImportDraftDeck(input);
     }
   }
 }

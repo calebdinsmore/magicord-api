@@ -449,6 +449,87 @@ namespace Magicord.Modules.Users
       }
     }
 
+    public DraftDeckImportResultDto ImportDraftDeck(DraftDeckImportInputDto inputDto)
+    {
+      var user = _dataContext.Users
+        .Include(u => u.UserCards)
+        .FirstOrDefault(x => x.Id == inputDto.UserId);
+
+      if (user == null)
+      {
+        throw new QueryException("No user found. Have you done `mc start`?");
+      }
+
+      var result = new DraftDeckImportResultDto();
+      foreach (KeyValuePair<string, DraftDeckImportCardMeta> entry in inputDto.DeckCardUuids)
+      {
+        var card = _dataContext.Cards.FirstOrDefault(c => c.Uuid == entry.Key);
+        try
+        {
+          if (card != null)
+          {
+            AddCardToUser(card.Uuid, entry.Value.AmountFoil, entry.Value.AmountNonFoil, user);
+            for (int i = 0; i < entry.Value.AmountFoil + entry.Value.AmountNonFoil; i++) result.DeckCards.Add(_mapper.Map<DraftCardResultDto>(card));
+          }
+          else
+          {
+            result.Errors.Add($"Card with uuid {entry.Key} does not exist.");
+          }
+        }
+        catch (Exception e)
+        {
+          result.Errors.Add($"Failed to add card {card.Name} ({card.Uuid}).");
+          Console.WriteLine(e);
+        }
+      }
+
+      foreach (KeyValuePair<string, DraftDeckImportCardMeta> entry in inputDto.SideboardCardUuids)
+      {
+        var card = _dataContext.Cards.FirstOrDefault(c => c.Uuid == entry.Key);
+        try
+        {
+          if (card != null)
+          {
+            AddCardToUser(card.Uuid, entry.Value.AmountFoil, entry.Value.AmountNonFoil, user);
+            for (int i = 0; i < entry.Value.AmountFoil + entry.Value.AmountNonFoil; i++) result.SideboardCards.Add(_mapper.Map<DraftCardResultDto>(card));
+          }
+          else
+          {
+            result.Errors.Add($"Card with uuid {entry.Key} does not exist.");
+          }
+        }
+        catch (Exception e)
+        {
+          result.Errors.Add($"Failed to add card {card.Name} ({card.Uuid}).");
+          Console.WriteLine(e);
+        }
+      }
+
+      _dataContext.SaveChanges();
+      return result;
+    }
+
+    private void AddCardToUser(string cardUuid, int amountFoil, int amountNonFoil, User user)
+    {
+      var userCard = user.UserCards.FirstOrDefault(x => x.CardUuid == cardUuid);
+        if (userCard != null)
+        {
+          userCard.AmountFoil += amountFoil;
+          userCard.AmountNonFoil += amountNonFoil;
+        }
+        else
+        {
+          user.UserCards.Add(new UserCard
+          {
+            UserId = user.Id,
+            CardUuid = cardUuid,
+            Quantity = 0,
+            AmountFoil = amountFoil,
+            AmountNonFoil = amountNonFoil
+          });
+        }
+    }
+
     private async Task HandleChangedPriceAsync(Card card, bool isFoil)
     {
       var changedPrice = await CheckForPriceChangeAsync(card, isFoil);
