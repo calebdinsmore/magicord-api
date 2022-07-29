@@ -8,6 +8,18 @@ namespace Magicord.GraphQL.MutationTypes
 {
   public partial class Mutation
   {
+    public async Task<bool> UpdateTokenData([Service] IAdminProcessService service)
+    {
+      await service.UpdateTokenData();
+      return true;
+    }
+
+    public async Task<bool> FixTokenReverseRelated([Service] IAdminProcessService service)
+    {
+      await service.FixTokenReverseRelated();
+      return true;
+    }
+
     public async Task<bool> UpdateWithMtgJson([Service] IAdminProcessService service)
     {
       await service.PullDownMtgJsonData();

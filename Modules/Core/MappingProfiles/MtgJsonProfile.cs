@@ -46,9 +46,10 @@ namespace Magicord.Modules.Core.MappingProfiles
         .ForMember(dest => dest.FrameEffects, opt => opt.MapFrom(src => string.Join(',', src.FrameEffects)))
         .ForMember(dest => dest.Keywords, opt => opt.MapFrom(src => string.Join(',', src.Keywords)))
         .ForMember(dest => dest.PromoTypes, opt => opt.MapFrom(src => string.Join(',', src.PromoTypes)))
-        .ForMember(dest => dest.ReverseRelated, opt => opt.MapFrom(src => string.Join(',', src.ReverseRelated)))
+        .ForMember(dest => dest.ReverseRelated, opt => opt.MapFrom(src => ";" + string.Join(';', src.ReverseRelated) + ";"))
         .ForMember(dest => dest.Subtypes, opt => opt.MapFrom(src => string.Join(',', src.Subtypes)))
         .ForMember(dest => dest.Supertypes, opt => opt.MapFrom(src => string.Join(',', src.Supertypes)))
+        .ForMember(dest => dest.ScryfallId, opt => opt.MapFrom(src => src.Identifiers.GetValueOrDefault("scryfallId")))
         .ForMember(dest => dest.Types, opt => opt.MapFrom(src => string.Join(',', src.Types)));
 
       CreateMap<ForeignDataJson, ForeignData>();

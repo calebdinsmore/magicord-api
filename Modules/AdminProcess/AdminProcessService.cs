@@ -22,6 +22,54 @@ namespace Magicord.Modules.AdminProcess
       _dataContext = dataContext;
       _mapper = mapper;
     }
+
+    public async Task UpdateTokenData()
+    {
+      try
+      {
+        var setsWithoutTokens = _dataContext.Sets.Include(set => set.Tokens).Where(set => set.Tokens.Any() && !set.Tokens.Any(t => t.ScryfallId != null));
+        foreach (var set in setsWithoutTokens)
+        {
+          var setJson = await FetchBySetJson(set.Code);
+          foreach (var tokenModel in set.Tokens)
+          {
+            var tokenJson = setJson.Data.Tokens.FirstOrDefault(t => t.Uuid == tokenModel.Uuid);
+            if (tokenJson != null && tokenJson.Identifiers?.GetValueOrDefault("scryfallId") != null)
+            {
+              tokenModel.ScryfallId = tokenJson.Identifiers.GetValueOrDefault("scryfallId");
+            }
+          }
+          Console.WriteLine($"Processed {set.Code}");
+        }
+        _dataContext.SaveChanges();
+      }
+      catch(System.Exception)
+      {
+        throw;
+      }
+    }
+
+    public async Task FixTokenReverseRelated() {
+      var setsWithTokens = _dataContext.Sets.Include(s => s.Tokens).Where(s => s.Tokens.Any());
+      var total = setsWithTokens.Count();
+      var current = 0;
+      foreach (var set in setsWithTokens)
+      {
+        current++;
+        var setJson = await FetchBySetJson(set.Code);
+        foreach (var tokenModel in set.Tokens)
+        {
+          var tokenJson = setJson.Data.Tokens.FirstOrDefault(t => t.Uuid == tokenModel.Uuid);
+            if (tokenJson != null && tokenJson.ReverseRelated.Any())
+            {
+              tokenModel.ReverseRelated = $";{string.Join(';', tokenJson.ReverseRelated)};";
+            }
+        }
+        Console.WriteLine($"Processed {current}/{total}");
+      }
+      _dataContext.SaveChanges();
+    }
+
     public async Task PullDownMtgJsonData()
     {
       try
@@ -180,6 +228,14 @@ namespace Magicord.Modules.AdminProcess
       response.EnsureSuccessStatusCode();
       var jsonString = await response.Content.ReadAsStringAsync();
       return jsonString.ParseJson<AllPricesJson>();
+    }
+
+    private async Task<FetchBySetJson> FetchBySetJson(string setCode)
+    {
+      var response = await client.GetAsync($"https://mtgjson.com/api/v5/{setCode}.json");
+      response.EnsureSuccessStatusCode();
+      var jsonString = await response.Content.ReadAsStringAsync();
+      return jsonString.ParseJson<FetchBySetJson>();
     }
   }
 }

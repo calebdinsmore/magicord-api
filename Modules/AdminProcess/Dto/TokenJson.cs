@@ -30,6 +30,7 @@ namespace Magicord.Modules.AdminProcess
     public string Power { get; set; }
     public ICollection<string> PromoTypes { get; set; }
     public ICollection<string> ReverseRelated { get; set; }
+    public Dictionary<string, string> Identifiers { get; set; }
     public string ScryfallId { get; set; }
     public string ScryfallIllustrationId { get; set; }
     public string ScryfallOracleId { get; set; }

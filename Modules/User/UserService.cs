@@ -470,6 +470,13 @@ namespace Magicord.Modules.Users
           {
             AddCardToUser(card.Uuid, entry.Value.AmountFoil, entry.Value.AmountNonFoil, user);
             for (int i = 0; i < entry.Value.AmountFoil + entry.Value.AmountNonFoil; i++) result.DeckCards.Add(_mapper.Map<DraftCardResultDto>(card));
+            var tokens = _dataContext.Tokens.Where(t => t.SetCode == card.SetCode && t.ReverseRelated.Contains($";{card.Name};"));
+            foreach (var token in tokens)
+            {
+              if (!result.Tokens.Any(t => t.ScryfallId == token.ScryfallId)) {
+                result.Tokens.Add(_mapper.Map<DraftTokenResultDto>(token));
+              }
+            }
           }
           else
           {
@@ -492,6 +499,13 @@ namespace Magicord.Modules.Users
           {
             AddCardToUser(card.Uuid, entry.Value.AmountFoil, entry.Value.AmountNonFoil, user);
             for (int i = 0; i < entry.Value.AmountFoil + entry.Value.AmountNonFoil; i++) result.SideboardCards.Add(_mapper.Map<DraftCardResultDto>(card));
+            var tokens = _dataContext.Tokens.Where(t => t.SetCode == card.SetCode && t.ReverseRelated.Contains($";{card.Name};"));
+            foreach (var token in tokens)
+            {
+              if (!result.Tokens.Any(t => t.ScryfallId == token.ScryfallId)) {
+                result.Tokens.Add(_mapper.Map<DraftTokenResultDto>(token));
+              }
+            }
           }
           else
           {
