@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using HotChocolate;
 using Magicord.Modules.Trivia;
 
@@ -5,9 +6,9 @@ namespace Magicord.GraphQL.QueryTypes
 {
   public partial class Query
   {
-    public TriviaQuestionDto GetRandomTrivia([Service] ITriviaGeneratorFactory triviaGeneratorFactory)
+    public async Task<TriviaQuestionDto> GetRandomTrivia([Service] ITriviaGeneratorFactory triviaGeneratorFactory)
     {
-      return triviaGeneratorFactory.GetRandomTriviaGenerator().GenerateTriviaQuestion();
+      return await triviaGeneratorFactory.GetRandomTriviaGenerator().GenerateTriviaQuestion();
     }
   }
 }

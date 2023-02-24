@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Magicord.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +21,7 @@ namespace Magicord.Modules.Trivia
       InitConstants();
     }
 
-    public TriviaQuestionDto GenerateTriviaQuestion()
+    public async Task<TriviaQuestionDto> GenerateTriviaQuestion()
     {
       var triviaQuestionDto = new TriviaQuestionDto();
       Card card;

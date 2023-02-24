@@ -11,5 +11,6 @@ namespace Magicord.Modules.Trivia
     public decimal Reward { get; set; }
     public Card CardSubject { get; set; }
     public Set SetSubject { get; set; }
+    public string ImageUri { get; set; }
   }
 }

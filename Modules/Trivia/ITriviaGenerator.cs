@@ -1,7 +1,9 @@
+using System.Threading.Tasks;
+
 namespace Magicord.Modules.Trivia
 {
   public interface ITriviaGenerator
   {
-    TriviaQuestionDto GenerateTriviaQuestion();
+    Task<TriviaQuestionDto> GenerateTriviaQuestion();
   }
 }

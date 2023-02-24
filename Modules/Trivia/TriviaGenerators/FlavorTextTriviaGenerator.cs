@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Magicord.Models;
 
 namespace Magicord.Modules.Trivia
@@ -16,7 +17,7 @@ namespace Magicord.Modules.Trivia
       _random = random;
     }
 
-    public TriviaQuestionDto GenerateTriviaQuestion()
+    public async Task<TriviaQuestionDto> GenerateTriviaQuestion()
     {
       var card = GetRandomCard();
 

@@ -1,4 +1,3 @@
-using System.Linq;
 using Magicord.Models;
 
 namespace Magicord.Modules.Shop
