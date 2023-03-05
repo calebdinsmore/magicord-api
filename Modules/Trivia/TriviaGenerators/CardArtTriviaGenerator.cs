@@ -7,7 +7,7 @@ namespace Magicord.Modules.Trivia
 {
   public class CardArtTriviaGenerator : ITriviaGenerator
   {
-    private static readonly List<string> ArtTags = new List<string>(new[] { "axe", "boat", "skeleton", "rat", "orb", "dragon", "horse", "explosion" });
+    private static readonly List<string> ArtTags = new List<string>(new[] { "axe", "boat", "bone", "rat", "orb", "dragon", "horse", "explosion" });
     private IScryfallService _scryfallService;
     private Random _random;
 
